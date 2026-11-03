@@ -16,3 +16,4 @@ const wellnessCheckSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('WellnessCheck', wellnessCheckSchema);
+

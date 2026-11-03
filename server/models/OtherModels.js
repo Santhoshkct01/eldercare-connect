@@ -92,3 +92,4 @@ module.exports = {
   Expense: mongoose.model('Expense', expenseSchema),
   CarePlan: mongoose.model('CarePlan', carePlanSchema),
 };
+

@@ -8,3 +8,4 @@ router.get('/users', protect, authorize('admin'), getAllUsers);
 router.put('/volunteers/:id/verify', protect, authorize('admin'), verifyVolunteer);
 
 module.exports = router;
+

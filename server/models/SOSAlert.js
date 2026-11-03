@@ -29,3 +29,4 @@ const sosAlertSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('SOSAlert', sosAlertSchema);
+

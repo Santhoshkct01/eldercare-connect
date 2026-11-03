@@ -8,3 +8,4 @@ router.get('/', protect, getSOSAlerts);
 router.put('/:id', protect, updateSOS);
 
 module.exports = router;
+

@@ -57,3 +57,4 @@ async function matchVolunteers(category, elderLocation, User) {
 }
 
 module.exports = { calculateDistance, matchVolunteers };
+

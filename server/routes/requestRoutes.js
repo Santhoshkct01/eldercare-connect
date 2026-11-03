@@ -8,3 +8,4 @@ router.get('/', protect, getRequests);
 router.put('/:id/status', protect, updateRequestStatus);
 
 module.exports = router;
+

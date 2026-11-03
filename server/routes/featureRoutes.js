@@ -204,3 +204,4 @@ router.post('/location/update', protect, async (req, res) => {
 });
 
 module.exports = router;
+

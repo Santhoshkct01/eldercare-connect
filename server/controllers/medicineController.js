@@ -49,3 +49,4 @@ const recordMedicineTaken = async (req, res) => {
 };
 
 module.exports = { addMedicine, getMedicines, recordMedicineTaken };
+

@@ -74,3 +74,4 @@ function initAutomation(io) {
 }
 
 module.exports = { initAutomation };
+

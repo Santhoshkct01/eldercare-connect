@@ -113,3 +113,4 @@ const updateSOS = async (req, res) => {
 };
 
 module.exports = { triggerSOS, getSOSAlerts, updateSOS };
+

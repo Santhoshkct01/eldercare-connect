@@ -153,3 +153,4 @@ const updateProfile = async (req, res) => {
 };
 
 module.exports = { register, login, getProfile, updateProfile };
+

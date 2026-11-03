@@ -122,3 +122,4 @@ const updateRequestStatus = async (req, res) => {
 };
 
 module.exports = { createRequest, getRequests, updateRequestStatus };
+

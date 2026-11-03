@@ -8,3 +8,4 @@ router.get('/', protect, getMedicines);
 router.put('/:id/take', protect, recordMedicineTaken);
 
 module.exports = router;
+

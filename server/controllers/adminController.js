@@ -62,3 +62,4 @@ const verifyVolunteer = async (req, res) => {
 };
 
 module.exports = { getDashboardStats, getAllUsers, verifyVolunteer };
+

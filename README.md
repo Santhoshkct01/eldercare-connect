@@ -73,3 +73,4 @@ This project includes a pre-configured `render.yaml` specification:
   - `MONGODB_PASSWORD`: [Configured securely in Render environment settings]
   - `MONGODB_AUTH_SOURCE`: `db_458492c92`
   - `JWT_SECRET`: [Secure random string]
+
