@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
     city: { type: String, default: '' },
     role: {
       type: String,
-      enum: ['elder', 'family', 'volunteer', 'caregiver', 'admin'],
+      enum: ['elder', 'family', 'volunteer', 'admin'],
       default: 'elder',
     },
     profilePicture: { type: String, default: '' },
@@ -29,11 +29,10 @@ const userSchema = new mongoose.Schema(
     mobilityRequirements: { type: String, default: 'None' },
     preferredLanguage: {
       type: String,
-      enum: ['en', 'ta', 'hi'],
+      enum: ['en', 'ta'],
       default: 'en',
     },
     familyMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    assignedCaregivers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     location: {
       latitude: { type: Number, default: 11.0168 },
       longitude: { type: Number, default: 76.9558 },
@@ -45,4 +44,3 @@ const userSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('User', userSchema);
-

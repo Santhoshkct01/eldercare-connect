@@ -27,7 +27,7 @@ const AdminUsers = () => {
           <div>
             <h1 className="text-2xl font-black text-slate-900">{t('sidebar.userManagement')}</h1>
             <p className="text-xs text-slate-500 mt-1">
-              Complete registry of all registered seniors, volunteers, caregivers, family members and admins.
+              Complete registry of all registered seniors, volunteers, family members and admins.
             </p>
           </div>
 
@@ -48,7 +48,6 @@ const AdminUsers = () => {
               <option value="elder">Elder</option>
               <option value="family">Family</option>
               <option value="volunteer">Volunteer</option>
-              <option value="caregiver">Caregiver</option>
               <option value="admin">Admin</option>
             </select>
           </div>

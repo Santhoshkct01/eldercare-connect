@@ -54,13 +54,6 @@ const Sidebar = () => {
     { name: t('sidebar.completedMissions'), path: '/volunteer/history', icon: CheckCircle },
   ];
 
-  const caregiverNav = [
-    { name: t('sidebar.caregiverDashboard'), path: '/caregiver/dashboard', icon: LayoutDashboard },
-    { name: t('sidebar.assignedElders'), path: '/caregiver/elders', icon: Users },
-    { name: t('sidebar.carePlans'), path: '/caregiver/careplans', icon: FileText },
-    { name: t('sidebar.healthLogs'), path: '/caregiver/health', icon: Activity },
-  ];
-
   const adminNav = [
     { name: t('sidebar.adminOverview'), path: '/admin/dashboard', icon: LayoutDashboard },
     { name: t('sidebar.userManagement'), path: '/admin/users', icon: Users },
@@ -72,7 +65,6 @@ const Sidebar = () => {
   let currentNav = elderNav;
   if (role === 'family') currentNav = familyNav;
   if (role === 'volunteer') currentNav = volunteerNav;
-  if (role === 'caregiver') currentNav = caregiverNav;
   if (role === 'admin') currentNav = adminNav;
 
   return (

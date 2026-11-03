@@ -39,6 +39,10 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Eldercare Connect supports: elder, family, volunteer, admin.
+    const allowedRoles = ['elder', 'family', 'volunteer', 'admin'];
+    const assignedRole = allowedRoles.includes(role) ? role : 'elder';
+
     const user = await User.create({
       name,
       email: email.toLowerCase(),
@@ -47,7 +51,7 @@ const register = async (req, res) => {
       age: Number(age) || 65,
       address: address || '',
       city: city || '',
-      role: role || 'elder',
+      role: assignedRole,
       emergencyContact: emergencyContact || {},
       medicalConditions: medicalConditions || [],
       mobilityRequirements: mobilityRequirements || 'None',

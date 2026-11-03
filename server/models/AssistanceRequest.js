@@ -51,6 +51,33 @@ const assistanceRequestSchema = new mongoose.Schema(
       default: 'Pending',
     },
     assignedVolunteer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Admin who assigned manually
+    assignmentType: {
+      type: String,
+      enum: ['automatic', 'admin_manual', 'unassigned'],
+      default: 'unassigned',
+    },
+    assignmentStatus: {
+      type: String,
+      enum: ['pending', 'assigned', 'reassigned', 'cancelled'],
+      default: 'pending',
+    },
+    locationComparison: {
+      type: String,
+      enum: ['same_location', 'different_location', 'unavailable'],
+      default: 'unavailable',
+    },
+    distanceMeters: { type: Number, default: null },
+    assignmentHistory: [
+      {
+        previousVolunteer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        assignedVolunteer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        assignmentType: { type: String },
+        assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        timestamp: { type: Date, default: Date.now },
+        notes: { type: String, default: '' },
+      },
+    ],
     notes: { type: String, default: '' },
     completedAt: { type: Date },
   },
@@ -58,4 +85,3 @@ const assistanceRequestSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('AssistanceRequest', assistanceRequestSchema);
-

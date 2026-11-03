@@ -99,16 +99,29 @@ const ElderRequests = () => {
               <div className="flex flex-col items-end space-y-2">
                 <span className={`px-3 py-1.5 rounded-xl text-xs font-bold ${
                   req.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' :
-                  req.status === 'Accepted' || req.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                  req.status === 'Accepted' || req.status === 'In Progress' || req.status === 'Volunteer Assigned' ? 'bg-blue-100 text-blue-800' :
                   'bg-amber-100 text-amber-800'
                 }`}>
                   {t('requests.status')}: {req.status}
                 </span>
 
-                {req.assignedVolunteer && (
+                {req.assignedVolunteer ? (
                   <p className="text-xs text-slate-600">
                     {t('requests.assigned')}: <strong>{req.assignedVolunteer.name}</strong> ({req.assignedVolunteer.phone})
+                    {req.assignmentType === 'automatic' && (
+                      <span className="ml-1 text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">
+                        {language === 'ta' ? 'தானாக ஒதுக்கப்பட்டது' : 'Auto-Assigned'}
+                      </span>
+                    )}
                   </p>
+                ) : (
+                  <div className="bg-amber-50 border border-amber-200 text-amber-800 p-2.5 rounded-xl text-xs max-w-sm text-right">
+                    <p className="font-semibold">
+                      {language === 'ta'
+                        ? 'உங்கள் கோரிக்கை சமர்ப்பிக்கப்பட்டது. எங்கள் நிர்வாகி பொருத்தமான தன்னார்வலரை நியமிப்பார்.'
+                        : 'Your request has been submitted. Our administrator will assign a suitable volunteer.'}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

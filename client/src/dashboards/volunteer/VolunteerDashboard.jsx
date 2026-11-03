@@ -98,6 +98,16 @@ const VolunteerDashboard = () => {
                       <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[11px] font-bold rounded">
                         {t('requests.priority')}: {req.priority}
                       </span>
+                      {req.assignmentType === 'automatic' && (
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">
+                          {language === 'ta' ? 'தானியங்கி ஒதுக்கீடு' : 'Auto-Assigned (<=100m)'}
+                        </span>
+                      )}
+                      {req.assignmentType === 'admin_manual' && (
+                        <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] font-bold rounded">
+                          {language === 'ta' ? 'நிர்வாகி ஒதுக்கீடு' : 'Assigned by Administrator'}
+                        </span>
+                      )}
                     </div>
 
                     <h4 className="text-base font-bold text-slate-800">{req.description}</h4>

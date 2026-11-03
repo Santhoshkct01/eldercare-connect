@@ -30,10 +30,6 @@ import VolunteerDashboard from './dashboards/volunteer/VolunteerDashboard';
 import VolunteerSOS from './dashboards/volunteer/VolunteerSOS';
 import VolunteerHistory from './dashboards/volunteer/VolunteerHistory';
 
-// Caregiver Views
-import CaregiverDashboard from './dashboards/caregiver/CaregiverDashboard';
-import CaregiverElders from './dashboards/caregiver/CaregiverElders';
-import CaregiverHealth from './dashboards/caregiver/CaregiverHealth';
 
 // Admin Views
 import AdminDashboard from './dashboards/admin/AdminDashboard';
@@ -122,12 +118,6 @@ function App() {
           <Route path="/volunteer/requests" element={<ProtectedRoute allowedRoles={['volunteer']}><VolunteerDashboard /></ProtectedRoute>} />
           <Route path="/volunteer/sos" element={<ProtectedRoute allowedRoles={['volunteer']}><VolunteerSOS /></ProtectedRoute>} />
           <Route path="/volunteer/history" element={<ProtectedRoute allowedRoles={['volunteer']}><VolunteerHistory /></ProtectedRoute>} />
-
-          {/* Caregiver Protected Routes */}
-          <Route path="/caregiver/dashboard" element={<ProtectedRoute allowedRoles={['caregiver']}><CaregiverDashboard /></ProtectedRoute>} />
-          <Route path="/caregiver/elders" element={<ProtectedRoute allowedRoles={['caregiver']}><CaregiverElders /></ProtectedRoute>} />
-          <Route path="/caregiver/careplans" element={<ProtectedRoute allowedRoles={['caregiver']}><CaregiverDashboard /></ProtectedRoute>} />
-          <Route path="/caregiver/health" element={<ProtectedRoute allowedRoles={['caregiver']}><CaregiverHealth /></ProtectedRoute>} />
 
           {/* Admin Protected Routes */}
           <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />

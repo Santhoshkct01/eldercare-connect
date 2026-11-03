@@ -94,7 +94,6 @@ const RegisterPage = () => {
                 <option value="elder">{t('roles.elder')}</option>
                 <option value="family">{t('roles.family')}</option>
                 <option value="volunteer">{t('roles.volunteer')}</option>
-                <option value="caregiver">{t('roles.caregiver')}</option>
                 <option value="admin">{t('roles.admin')}</option>
               </select>
             </div>
