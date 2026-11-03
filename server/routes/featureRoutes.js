@@ -21,7 +21,7 @@ const {
 router.get('/appointments', protect, async (req, res) => {
   try {
     const elder = req.user.role === 'elder' ? req.user._id : req.query.elderId;
-    const items = await Appointment.find(elder ? { elder } : {}).populate('elder', 'name phone');
+    const items = await Appointment.find(elder ? { elder } : {}).populate('elder', 'name phone').sort({ appointmentDate: 1 });
     res.json(items);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching appointments' });
@@ -38,12 +38,67 @@ router.post('/appointments', protect, async (req, res) => {
       hospital,
       appointmentDate,
       appointmentTime,
-      specialty,
-      notes,
+      specialty: specialty || 'General Physician',
+      notes: notes || '',
     });
     res.status(201).json(appt);
   } catch (err) {
     res.status(500).json({ message: 'Error booking appointment' });
+  }
+});
+
+router.put('/appointments/:id/cancel', protect, async (req, res) => {
+  try {
+    const appt = await Appointment.findByIdAndUpdate(req.params.id, { status: 'Cancelled' }, { new: true });
+    res.json(appt);
+  } catch (err) {
+    res.status(500).json({ message: 'Error cancelling appointment' });
+  }
+});
+
+router.delete('/appointments/:id', protect, async (req, res) => {
+  try {
+    await Appointment.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Appointment deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting appointment' });
+  }
+});
+
+// TRUSTED CONTACTS
+router.get('/contacts', protect, async (req, res) => {
+  try {
+    const elder = req.user.role === 'elder' ? req.user._id : req.query.elderId;
+    const contacts = await TrustedContact.find(elder ? { elder } : {});
+    res.json(contacts);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching contacts' });
+  }
+});
+
+router.post('/contacts', protect, async (req, res) => {
+  try {
+    const elder = req.user.role === 'elder' ? req.user._id : req.body.elderId;
+    const { name, phone, relation, isEmergencyDefault } = req.body;
+    const contact = await TrustedContact.create({
+      elder,
+      name,
+      phone,
+      relation: relation || 'Family',
+      isEmergencyDefault: !!isEmergencyDefault,
+    });
+    res.status(201).json(contact);
+  } catch (err) {
+    res.status(500).json({ message: 'Error creating contact' });
+  }
+});
+
+router.delete('/contacts/:id', protect, async (req, res) => {
+  try {
+    await TrustedContact.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Contact deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting contact' });
   }
 });
 
@@ -140,24 +195,12 @@ router.post('/medical-documents', protect, async (req, res) => {
   }
 });
 
-// EXPENSES
-router.get('/expenses', protect, async (req, res) => {
+router.delete('/medical-documents/:id', protect, async (req, res) => {
   try {
-    const elder = req.user.role === 'elder' ? req.user._id : req.query.elderId;
-    const expenses = await Expense.find(elder ? { elder } : {}).sort({ date: -1 });
-    res.json(expenses);
+    await MedicalDocument.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Document deleted successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching expenses' });
-  }
-});
-
-router.post('/expenses', protect, async (req, res) => {
-  try {
-    const elder = req.user.role === 'elder' ? req.user._id : req.body.elderId;
-    const exp = await Expense.create({ ...req.body, elder });
-    res.status(201).json(exp);
-  } catch (err) {
-    res.status(500).json({ message: 'Error saving expense' });
+    res.status(500).json({ message: 'Error deleting document' });
   }
 });
 
@@ -191,8 +234,8 @@ router.post('/location/update', protect, async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: 'User not found' });
     user.location = {
-      latitude,
-      longitude,
+      latitude: Number(latitude) || user.location?.latitude || 11.0168,
+      longitude: Number(longitude) || user.location?.longitude || 76.9558,
       updatedAt: new Date(),
       isSharing: typeof isSharing === 'boolean' ? isSharing : user.location.isSharing,
     };
@@ -204,4 +247,3 @@ router.post('/location/update', protect, async (req, res) => {
 });
 
 module.exports = router;
-

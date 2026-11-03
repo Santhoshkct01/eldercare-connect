@@ -8,15 +8,44 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const { i18n } = useTranslation();
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('userInfo');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('userInfo');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
   });
-  const [loading, setLoading] = useState(false);
+
+  const [authLoading, setAuthLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
   const [largeText, setLargeText] = useState(() => localStorage.getItem('accessibility_largeText') === 'true');
   const [highContrast, setHighContrast] = useState(() => localStorage.getItem('accessibility_highContrast') === 'true');
   const [language, setLanguageState] = useState(() => {
     return localStorage.getItem('eldercare_lang') || 'en';
   });
+
+  // Verify and refresh profile on app startup
+  useEffect(() => {
+    const verifyUserSession = async () => {
+      if (user && user.token) {
+        try {
+          const res = await api.get('/auth/profile');
+          const updated = { ...user, ...res.data, token: user.token };
+          setUser(updated);
+          localStorage.setItem('userInfo', JSON.stringify(updated));
+          if (updated.preferredLanguage) {
+            setLanguageState(updated.preferredLanguage);
+            i18n.changeLanguage(updated.preferredLanguage);
+          }
+        } catch (err) {
+          console.warn('Initial session check note:', err.message);
+        }
+      }
+      setAuthLoading(false);
+    };
+
+    verifyUserSession();
+  }, []);
 
   // Sync language with i18n and localStorage
   const setLanguage = async (newLang) => {
@@ -37,15 +66,6 @@ export const AuthProvider = ({ children }) => {
       }
     }
   };
-
-  useEffect(() => {
-    if (user && user.preferredLanguage) {
-      const preferred = user.preferredLanguage === 'ta' ? 'ta' : 'en';
-      setLanguageState(preferred);
-      localStorage.setItem('eldercare_lang', preferred);
-      i18n.changeLanguage(preferred);
-    }
-  }, [user]);
 
   useEffect(() => {
     if (user && user._id) {
@@ -72,7 +92,7 @@ export const AuthProvider = ({ children }) => {
   }, [highContrast]);
 
   const login = async (email, password) => {
-    setLoading(true);
+    setActionLoading(true);
     try {
       const res = await api.post('/auth/login', { email, password });
       setUser(res.data);
@@ -80,16 +100,16 @@ export const AuthProvider = ({ children }) => {
       if (res.data.preferredLanguage) {
         setLanguage(res.data.preferredLanguage);
       }
-      setLoading(false);
+      setActionLoading(false);
       return res.data;
     } catch (err) {
-      setLoading(false);
+      setActionLoading(false);
       throw err.response?.data?.message || 'Login failed';
     }
   };
 
   const register = async (userData) => {
-    setLoading(true);
+    setActionLoading(true);
     try {
       const res = await api.post('/auth/register', userData);
       setUser(res.data);
@@ -97,10 +117,10 @@ export const AuthProvider = ({ children }) => {
       if (res.data.preferredLanguage) {
         setLanguage(res.data.preferredLanguage);
       }
-      setLoading(false);
+      setActionLoading(false);
       return res.data;
     } catch (err) {
-      setLoading(false);
+      setActionLoading(false);
       throw err.response?.data?.message || 'Registration failed';
     }
   };
@@ -119,7 +139,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        loading,
+        authLoading,
+        actionLoading,
         largeText,
         setLargeText,
         highContrast,
