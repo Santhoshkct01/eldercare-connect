@@ -1,0 +1,22 @@
+{
+  "name": "eldercare-connect-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Smart Elderly Assistance Platform",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "start": "node server/server.js",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "test": "node server/tests/db_test.js"
+  },
+  "keywords": [
+    "eldercare",
+    "assistance",
+    "mern",
+    "socketio"
+  ],
+  "author": "Eldercare Connect Team",
+  "license": "ISC"
+}

@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: eldercare-connect
+    env: node
+    plan: free
+    buildCommand: npm install && cd server && npm install && cd ../client && npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_HOST
+        value: db01.dbhost.dev
+      - key: MONGODB_PORT
+        value: 5050
+      - key: MONGODB_DATABASE
+        value: db_458492c92
+      - key: MONGODB_USERNAME
+        value: user_458492c92
+      - key: MONGODB_PASSWORD
+        sync: false
+      - key: MONGODB_AUTH_SOURCE
+        value: db_458492c92
+      - key: JWT_SECRET
+        generateValue: true
