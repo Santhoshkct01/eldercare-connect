@@ -50,3 +50,4 @@ const FamilyMedicines = () => {
 };
 
 export default FamilyMedicines;
+

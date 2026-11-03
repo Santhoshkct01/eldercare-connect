@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const Medicine = require('../models/Medicine');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const { sendSMS } = require('./smsService');
 
 function initAutomation(io) {
   console.log('[Automation] Initializing background schedulers...');
@@ -31,6 +32,14 @@ function initAutomation(io) {
           type: 'Medicine',
           link: '/elder/medicines',
         });
+
+        // Send SMS to elder if phone is available
+        if (med.elder.phone) {
+          await sendSMS(
+            med.elder.phone,
+            `Eldercare Reminder: It is time to take your dose of ${med.name} (${med.dosage}). Instructions: ${med.instructions}`
+          );
+        }
 
         // Emit real-time notification to elder
         if (io) {

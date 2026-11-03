@@ -55,3 +55,4 @@ An in-depth codebase audit of all frontend pages, dashboards, navigation compone
 4. **Register All Routes in `App.jsx`**: Wrap with `ProtectedRoute` matching exact roles.
 5. **Update Bilingual Translation Files**: Add all English & Tamil strings.
 6. **Compile, Test & Push**: Verify with `npm run build`, run backend verification, and push to GitHub.
+

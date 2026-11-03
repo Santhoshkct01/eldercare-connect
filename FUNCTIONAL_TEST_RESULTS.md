@@ -45,3 +45,4 @@
 ## 3. Bilingual Verification
 - Every single new page (Appointments, Location, Documents, Community, SOS Monitors, User lists) uses `useTranslation` keys and formats localized dates with `en-IN` / `ta-IN`.
 - All buttons across English and Tamil interfaces were verified without layout shifting or text overflows.
+

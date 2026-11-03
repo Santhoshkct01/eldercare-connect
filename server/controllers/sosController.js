@@ -2,6 +2,7 @@ const SOSAlert = require('../models/SOSAlert');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { matchVolunteers } = require('../services/matchingService');
+const { sendSMS } = require('../services/smsService');
 
 // @desc Trigger SOS alert
 // @route POST /api/sos
@@ -35,16 +36,27 @@ const triggerSOS = async (req, res) => {
       });
     }
 
-    // 2. Notify connected family members
+    // 2. Notify connected family members & Emergency Contacts via SMS
+    const mapUrl = `https://maps.google.com/?q=${alert.location.latitude},${alert.location.longitude}`;
+    const smsMessage = `Emergency Alert! Elder ${elder.name} needs immediate assistance.\nLocation: ${mapUrl}\nPlease respond immediately. (Eldercare Connect)`;
+
+    if (elder.emergencyContact?.phone) {
+      await sendSMS(elder.emergencyContact.phone, smsMessage);
+    }
+
     if (elder.familyMembers && elder.familyMembers.length > 0) {
-      for (const famId of elder.familyMembers) {
+      const families = await User.find({ _id: { $in: elder.familyMembers } });
+      for (const fam of families) {
         await Notification.create({
-          recipient: famId,
+          recipient: fam._id,
           title: `EMERGENCY ALERT: ${elder.name} Needs Immediate Help!`,
-          message: `Location: https://maps.google.com/?q=${alert.location.latitude},${alert.location.longitude}`,
+          message: `Location: ${mapUrl}`,
           type: 'SOS',
           link: '/family/dashboard',
         });
+        if (fam.phone) {
+          await sendSMS(fam.phone, smsMessage);
+        }
       }
     }
 
