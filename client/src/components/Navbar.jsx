@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { Heart, Globe, Type, Eye, LogOut, Menu, X, ShieldAlert } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout, largeText, setLargeText, highContrast, setHighContrast, language, setLanguage } = useAuth();
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const navigate = useNavigate();
 
@@ -23,16 +25,17 @@ const Navbar = () => {
             </div>
             <div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">
-                Eldercare Connect
+                {t('nav.brand')}
               </span>
               <span className="block text-[10px] text-slate-500 font-medium uppercase tracking-wider">
-                Smart Assistance Platform
+                {t('nav.tagline')}
               </span>
             </div>
           </Link>
 
-          {/* Accessibility Controls & Language */}
+          {/* Desktop Controls */}
           <div className="hidden md:flex items-center space-x-3">
+            {/* Accessibility Controls */}
             <button
               onClick={() => setLargeText(!largeText)}
               title="Toggle Large Typography"
@@ -41,7 +44,7 @@ const Navbar = () => {
               }`}
             >
               <Type className="w-4 h-4" />
-              <span>A+</span>
+              <span>{t('nav.largeText')}</span>
             </button>
 
             <button
@@ -52,29 +55,23 @@ const Navbar = () => {
               }`}
             >
               <Eye className="w-4 h-4" />
-              <span>Contrast</span>
+              <span>{t('nav.contrast')}</span>
             </button>
 
             {/* Language Switcher */}
-            <div className="flex items-center space-x-1 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs">
+            <div className="flex items-center space-x-1 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs font-semibold">
               <Globe className="w-3.5 h-3.5 text-slate-500 ml-1" />
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-2 py-0.5 rounded ${language === 'en' ? 'bg-blue-600 text-white font-bold' : 'text-slate-600'}`}
+                className={`px-2.5 py-1 rounded-md transition ${language === 'en' ? 'bg-blue-600 text-white font-bold shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
               >
-                EN
+                🌐 English
               </button>
               <button
                 onClick={() => setLanguage('ta')}
-                className={`px-2 py-0.5 rounded ${language === 'ta' ? 'bg-blue-600 text-white font-bold' : 'text-slate-600'}`}
+                className={`px-2.5 py-1 rounded-md transition ${language === 'ta' ? 'bg-blue-600 text-white font-bold shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
               >
-                தமிழ்
-              </button>
-              <button
-                onClick={() => setLanguage('hi')}
-                className={`px-2 py-0.5 rounded ${language === 'hi' ? 'bg-blue-600 text-white font-bold' : 'text-slate-600'}`}
-              >
-                हिन्दी
+                🌐 தமிழ்
               </button>
             </div>
 
@@ -85,7 +82,7 @@ const Navbar = () => {
                   to={`/${user.role}/dashboard`}
                   className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-100"
                 >
-                  Dashboard ({user.role})
+                  {t('nav.dashboard')} ({t(`roles.${user.role}`)})
                 </Link>
                 {user.role === 'elder' && (
                   <button
@@ -93,13 +90,13 @@ const Navbar = () => {
                     className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold flex items-center space-x-1 shadow animate-pulse"
                   >
                     <ShieldAlert className="w-4 h-4" />
-                    <span>SOS</span>
+                    <span>{t('nav.sos')}</span>
                   </button>
                 )}
                 <button
                   onClick={logout}
                   className="p-2 text-slate-500 hover:text-red-600 rounded-lg"
-                  title="Logout"
+                  title={t('nav.logout')}
                 >
                   <LogOut className="w-5 h-5" />
                 </button>
@@ -110,23 +107,37 @@ const Navbar = () => {
                   to="/login"
                   className="px-4 py-2 text-slate-700 font-semibold text-sm hover:text-blue-600"
                 >
-                  Login
+                  {t('nav.login')}
                 </Link>
                 <Link
                   to="/register"
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-lg shadow-sm"
                 >
-                  Get Started
+                  {t('nav.register')}
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile Right Controls: Language & Menu button */}
           <div className="flex md:hidden items-center space-x-2">
+            <div className="flex items-center space-x-1 bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-1 rounded ${language === 'en' ? 'bg-blue-600 text-white font-bold' : 'text-slate-700'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLanguage('ta')}
+                className={`px-2 py-1 rounded ${language === 'ta' ? 'bg-blue-600 text-white font-bold' : 'text-slate-700'}`}
+              >
+                தமிழ்
+              </button>
+            </div>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-600"
+              className="p-2 text-slate-600 rounded-lg"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -137,19 +148,19 @@ const Navbar = () => {
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-3">
-          <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">Home</Link>
-          <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">About Us</Link>
-          <Link to="/services" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">Services</Link>
-          <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">Contact</Link>
+          <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">{t('nav.home')}</Link>
+          <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">{t('nav.about')}</Link>
+          <Link to="/services" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">{t('nav.services')}</Link>
+          <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-700 font-medium">{t('nav.contact')}</Link>
           {user ? (
             <div className="pt-2 border-t border-slate-100 flex flex-col space-y-2">
-              <Link to={`/${user.role}/dashboard`} onClick={() => setMobileMenuOpen(false)} className="py-2 text-blue-600 font-bold">Go to Dashboard</Link>
-              <button onClick={logout} className="text-left py-2 text-red-600 font-medium">Logout</button>
+              <Link to={`/${user.role}/dashboard`} onClick={() => setMobileMenuOpen(false)} className="py-2 text-blue-600 font-bold">{t('nav.dashboard')}</Link>
+              <button onClick={logout} className="text-left py-2 text-red-600 font-medium">{t('nav.logout')}</button>
             </div>
           ) : (
             <div className="pt-2 border-t border-slate-100 flex space-x-3">
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="w-1/2 text-center py-2 border border-slate-300 rounded-lg font-semibold">Login</Link>
-              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="w-1/2 text-center py-2 bg-blue-600 text-white rounded-lg font-semibold">Register</Link>
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="w-1/2 text-center py-2 border border-slate-300 rounded-lg font-semibold">{t('nav.login')}</Link>
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="w-1/2 text-center py-2 bg-blue-600 text-white rounded-lg font-semibold">{t('nav.register')}</Link>
             </div>
           )}
         </div>
@@ -159,4 +170,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

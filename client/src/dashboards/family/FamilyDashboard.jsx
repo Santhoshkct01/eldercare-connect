@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import socket from '../../services/socket';
 import { Users, MapPin, Pill, HeartPulse, ShieldAlert, PhoneCall, AlertCircle } from 'lucide-react';
 
 const FamilyDashboard = () => {
-  const [elders, setElders] = useState([]);
+  const { t } = useTranslation();
   const [sosAlerts, setSosAlerts] = useState([]);
   const [wellnessLogs, setWellnessLogs] = useState([]);
   const [medicines, setMedicines] = useState([]);
-  const [liveLocation, setLiveLocation] = useState(null);
 
   useEffect(() => {
     fetchFamilyData();
@@ -43,11 +43,11 @@ const FamilyDashboard = () => {
       <div className="space-y-6">
         <div className="bg-gradient-to-r from-teal-600 to-blue-600 rounded-3xl p-6 md:p-8 text-white shadow-lg">
           <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider">
-            Family Care Portal
+            {t('family.portalBadge')}
           </span>
-          <h1 className="text-3xl font-black mt-2">Loved Ones Monitoring</h1>
+          <h1 className="text-3xl font-black mt-2">{t('family.title')}</h1>
           <p className="mt-1 text-teal-100 text-sm">
-            Live health updates, medication adherence tracking, and instantaneous emergency alert dispatch.
+            {t('family.subtitle')}
           </p>
         </div>
 
@@ -57,9 +57,9 @@ const FamilyDashboard = () => {
             <div className="flex items-center space-x-3">
               <ShieldAlert className="w-8 h-8 text-red-600" />
               <div>
-                <h3 className="font-extrabold text-lg">CRITICAL: Active Emergency Alert!</h3>
+                <h3 className="font-extrabold text-lg">{t('family.criticalSosTitle')}</h3>
                 <p className="text-xs mt-0.5">
-                  An elder under your watch has triggered an active SOS alert. Response team is dispatched.
+                  {t('family.criticalSosDesc')}
                 </p>
               </div>
             </div>
@@ -74,30 +74,30 @@ const FamilyDashboard = () => {
                 <HeartPulse className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-base">Latest Wellness Check</h3>
-                <p className="text-xs text-slate-500">Self-reported daily vitals</p>
+                <h3 className="font-bold text-slate-900 text-base">{t('family.wellnessCard')}</h3>
+                <p className="text-xs text-slate-500">{t('family.wellnessSub')}</p>
               </div>
             </div>
 
             {wellnessLogs.length > 0 ? (
               <div className="space-y-3 text-xs">
                 <div className="p-3 bg-slate-50 rounded-xl flex justify-between">
-                  <span className="text-slate-500">Reported Mood</span>
+                  <span className="text-slate-500">{t('family.reportedMood')}</span>
                   <span className="font-bold text-slate-800">{wellnessLogs[0].mood}</span>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl flex justify-between">
-                  <span className="text-slate-500">Sleep Duration</span>
-                  <span className="font-bold text-slate-800">{wellnessLogs[0].sleepHours} Hours</span>
+                  <span className="text-slate-500">{t('family.sleepDuration')}</span>
+                  <span className="font-bold text-slate-800">{wellnessLogs[0].sleepHours} {t('wellness.hours')}</span>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl flex justify-between">
-                  <span className="text-slate-500">Blood Pressure</span>
+                  <span className="text-slate-500">{t('family.bloodPressure')}</span>
                   <span className="font-bold text-slate-800">
                     {wellnessLogs[0].bloodPressure?.systolic || 120} / {wellnessLogs[0].bloodPressure?.diastolic || 80}
                   </span>
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-slate-400 py-4">No wellness checks logged today yet.</p>
+              <p className="text-xs text-slate-400 py-4">{t('family.noWellness')}</p>
             )}
           </div>
 
@@ -108,8 +108,8 @@ const FamilyDashboard = () => {
                 <Pill className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-base">Medication Tracking</h3>
-                <p className="text-xs text-slate-500">Automated intake verification</p>
+                <h3 className="font-bold text-slate-900 text-base">{t('family.medCard')}</h3>
+                <p className="text-xs text-slate-500">{t('family.medSub')}</p>
               </div>
             </div>
 
@@ -121,7 +121,7 @@ const FamilyDashboard = () => {
                     <p className="text-slate-500 text-[11px]">{med.dosage}</p>
                   </div>
                   <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-md font-bold text-[11px]">
-                    Prescribed
+                    {t('family.prescribed')}
                   </span>
                 </div>
               ))}
@@ -135,13 +135,13 @@ const FamilyDashboard = () => {
                 <MapPin className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-base">Authorized Location</h3>
-                <p className="text-xs text-slate-500">Live GPS tracking</p>
+                <h3 className="font-bold text-slate-900 text-base">{t('family.locationCard')}</h3>
+                <p className="text-xs text-slate-500">{t('family.locationSub')}</p>
               </div>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-xs text-slate-600 space-y-2">
-              <p className="font-semibold text-slate-800">Home Residence Coordinates:</p>
+              <p className="font-semibold text-slate-800">{t('family.residenceCoords')}</p>
               <p className="font-mono text-[11px]">Lat: 11.0168, Lon: 76.9558</p>
               <a
                 href="https://maps.google.com/?q=11.0168,76.9558"
@@ -149,7 +149,7 @@ const FamilyDashboard = () => {
                 rel="noreferrer"
                 className="inline-block mt-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-xs"
               >
-                Open in Google Maps
+                {t('family.openMaps')}
               </a>
             </div>
           </div>
@@ -160,4 +160,3 @@ const FamilyDashboard = () => {
 };
 
 export default FamilyDashboard;
-

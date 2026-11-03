@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   ShieldAlert,
@@ -18,6 +19,7 @@ import {
 
 const Sidebar = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const location = useLocation();
 
   if (!user) return null;
@@ -25,46 +27,46 @@ const Sidebar = () => {
   const role = user.role;
 
   const elderNav = [
-    { name: 'Dashboard', path: '/elder/dashboard', icon: LayoutDashboard },
-    { name: 'Emergency SOS', path: '/elder/sos', icon: ShieldAlert, highlight: true },
-    { name: 'My Medicines', path: '/elder/medicines', icon: Pill },
-    { name: 'Doctor Appointments', path: '/elder/appointments', icon: Calendar },
-    { name: 'Request Assistance', path: '/elder/requests', icon: HandHeart },
-    { name: 'Daily Wellness Check', path: '/elder/wellness', icon: HeartPulse },
-    { name: 'Location Sharing', path: '/elder/location', icon: MapPin },
-    { name: 'Medical Vault', path: '/elder/documents', icon: FileText },
-    { name: 'Community Events', path: '/community', icon: Users },
+    { name: t('sidebar.dashboard'), path: '/elder/dashboard', icon: LayoutDashboard },
+    { name: t('sidebar.emergencySos'), path: '/elder/sos', icon: ShieldAlert, highlight: true },
+    { name: t('sidebar.medicines'), path: '/elder/medicines', icon: Pill },
+    { name: t('sidebar.appointments'), path: '/elder/appointments', icon: Calendar },
+    { name: t('sidebar.requestAssistance'), path: '/elder/requests', icon: HandHeart },
+    { name: t('sidebar.wellnessCheck'), path: '/elder/wellness', icon: HeartPulse },
+    { name: t('sidebar.locationSharing'), path: '/elder/location', icon: MapPin },
+    { name: t('sidebar.medicalVault'), path: '/elder/documents', icon: FileText },
+    { name: t('sidebar.communityEvents'), path: '/community', icon: Users },
   ];
 
   const familyNav = [
-    { name: 'Family Dashboard', path: '/family/dashboard', icon: LayoutDashboard },
-    { name: 'Live GPS Location', path: '/family/location', icon: MapPin },
-    { name: 'Medicine Adherence', path: '/family/medicines', icon: Pill },
-    { name: 'Wellness Tracker', path: '/family/wellness', icon: HeartPulse },
-    { name: 'SOS Alerts', path: '/family/sos', icon: ShieldAlert },
-    { name: 'Assistance History', path: '/family/requests', icon: HandHeart },
+    { name: t('sidebar.familyDashboard'), path: '/family/dashboard', icon: LayoutDashboard },
+    { name: t('sidebar.liveGps'), path: '/family/location', icon: MapPin },
+    { name: t('sidebar.medicineAdherence'), path: '/family/medicines', icon: Pill },
+    { name: t('sidebar.wellnessTracker'), path: '/family/wellness', icon: HeartPulse },
+    { name: t('sidebar.sosAlerts'), path: '/family/sos', icon: ShieldAlert },
+    { name: t('sidebar.assistanceHistory'), path: '/family/requests', icon: HandHeart },
   ];
 
   const volunteerNav = [
-    { name: 'Volunteer Dashboard', path: '/volunteer/dashboard', icon: LayoutDashboard },
-    { name: 'Available Tasks', path: '/volunteer/requests', icon: HandHeart },
-    { name: 'Emergency SOS Dispatches', path: '/volunteer/sos', icon: ShieldAlert, highlight: true },
-    { name: 'Completed Missions', path: '/volunteer/history', icon: CheckCircle },
+    { name: t('sidebar.volunteerDashboard'), path: '/volunteer/dashboard', icon: LayoutDashboard },
+    { name: t('sidebar.availableTasks'), path: '/volunteer/requests', icon: HandHeart },
+    { name: t('sidebar.sosDispatches'), path: '/volunteer/sos', icon: ShieldAlert, highlight: true },
+    { name: t('sidebar.completedMissions'), path: '/volunteer/history', icon: CheckCircle },
   ];
 
   const caregiverNav = [
-    { name: 'Caregiver Dashboard', path: '/caregiver/dashboard', icon: LayoutDashboard },
-    { name: 'Assigned Elders', path: '/caregiver/elders', icon: Users },
-    { name: 'Care Plans', path: '/caregiver/careplans', icon: FileText },
-    { name: 'Health Logs', path: '/caregiver/health', icon: Activity },
+    { name: t('sidebar.caregiverDashboard'), path: '/caregiver/dashboard', icon: LayoutDashboard },
+    { name: t('sidebar.assignedElders'), path: '/caregiver/elders', icon: Users },
+    { name: t('sidebar.carePlans'), path: '/caregiver/careplans', icon: FileText },
+    { name: t('sidebar.healthLogs'), path: '/caregiver/health', icon: Activity },
   ];
 
   const adminNav = [
-    { name: 'Admin Overview', path: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'User Management', path: '/admin/users', icon: Users },
-    { name: 'Volunteer Approvals', path: '/admin/volunteers', icon: CheckCircle },
-    { name: 'Emergency Monitor', path: '/admin/sos', icon: ShieldAlert },
-    { name: 'All Assistance Requests', path: '/admin/requests', icon: HandHeart },
+    { name: t('sidebar.adminOverview'), path: '/admin/dashboard', icon: LayoutDashboard },
+    { name: t('sidebar.userManagement'), path: '/admin/users', icon: Users },
+    { name: t('sidebar.volunteerApprovals'), path: '/admin/volunteers', icon: CheckCircle },
+    { name: t('sidebar.emergencyMonitor'), path: '/admin/sos', icon: ShieldAlert },
+    { name: t('sidebar.allRequests'), path: '/admin/requests', icon: HandHeart },
   ];
 
   let currentNav = elderNav;
@@ -77,7 +79,7 @@ const Sidebar = () => {
     <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col justify-between py-6 min-h-[calc(100vh-4rem)]">
       <div className="px-4 space-y-1">
         <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-          {role.toUpperCase()} MENU
+          {t(`roles.${role}`).toUpperCase()} {t('sidebar.menu')}
         </div>
         {currentNav.map((item) => {
           const Icon = item.icon;
@@ -103,12 +105,11 @@ const Sidebar = () => {
 
       <div className="px-6 pt-4 border-t border-slate-100 text-xs text-slate-400">
         <p className="font-semibold text-slate-700">{user.name}</p>
-        <p className="capitalize text-teal-600 font-medium">{user.role}</p>
-        <p className="mt-1">Connected: db01.dbhost.dev</p>
+        <p className="capitalize text-teal-600 font-medium">{t(`roles.${user.role}`)}</p>
+        <p className="mt-1">{t('sidebar.connectedDb')}</p>
       </div>
     </aside>
   );
 };
 
 export default Sidebar;
-

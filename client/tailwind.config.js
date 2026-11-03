@@ -7,6 +7,9 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Noto Sans Tamil"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+      },
       colors: {
         primary: '#2563EB',
         secondary: '#14B8A6',
@@ -20,4 +23,3 @@ export default {
   },
   plugins: [],
 }
-

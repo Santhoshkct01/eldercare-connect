@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import socket from '../../services/socket';
 import { ShieldAlert, MapPin, CheckCircle, AlertTriangle, Phone, Radio } from 'lucide-react';
 
 const ElderSOS = () => {
   const { user } = useAuth();
-  const [status, setStatus] = useState('idle'); // idle, sending, active, resolved
+  const { t } = useTranslation();
+  const [status, setStatus] = useState('idle');
   const [alertData, setAlertData] = useState(null);
   const [coordinates, setCoordinates] = useState({ lat: 11.0168, lng: 76.9558 });
   const [address, setAddress] = useState(user?.address || 'Current Resident Location');
-  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -37,12 +38,10 @@ const ElderSOS = () => {
       });
       setAlertData(res.data.alert);
       setStatus('active');
-
-      // Join real-time socket emergency room
       socket.emit('join_emergency', res.data.alert._id);
     } catch (err) {
       console.error(err);
-      alert('Failed to dispatch SOS alert. Please dial 112 / 911 immediately.');
+      alert('Failed to dispatch SOS alert. Please dial 112 / 108 immediately.');
       setStatus('idle');
     }
   };
@@ -65,9 +64,9 @@ const ElderSOS = () => {
             <ShieldAlert className="w-10 h-10" />
           </div>
 
-          <h1 className="text-3xl font-extrabold text-red-900">Emergency SOS Dispatch</h1>
+          <h1 className="text-3xl font-extrabold text-red-900">{t('sos.title')}</h1>
           <p className="mt-2 text-red-700 text-sm max-w-lg mx-auto">
-            Pressing the SOS button instantly notifies your family members, platform administrators, and dispatches the nearest approved volunteers to your GPS location.
+            {t('sos.desc')}
           </p>
 
           <div className="mt-8">
@@ -77,13 +76,13 @@ const ElderSOS = () => {
                 className="w-48 h-48 rounded-full bg-red-600 hover:bg-red-700 text-white font-black text-2xl shadow-2xl transition transform hover:scale-105 active:scale-95 border-8 border-red-300 mx-auto flex flex-col items-center justify-center space-y-2 animate-bounce"
               >
                 <Radio className="w-8 h-8" />
-                <span>PRESS SOS</span>
+                <span>{t('sos.pressSos')}</span>
               </button>
             )}
 
             {status === 'sending' && (
               <div className="p-8 text-red-800 font-bold text-lg animate-pulse">
-                Broadcasting emergency coordinates to response team...
+                {t('sos.broadcasting')}
               </div>
             )}
 
@@ -92,23 +91,22 @@ const ElderSOS = () => {
                 <div className="p-5 bg-white rounded-2xl border border-red-300 shadow-md text-left">
                   <div className="flex items-center space-x-2 text-red-600 font-bold mb-2">
                     <AlertTriangle className="w-5 h-5" />
-                    <span>EMERGENCY DISPATCH BROADCAST ACTIVE</span>
+                    <span>{t('sos.broadcastActive')}</span>
                   </div>
                   <p className="text-xs text-slate-600">
-                    Alert ID: <strong>{alertData?._id}</strong>
+                    {t('sos.alertId')}: <strong>{alertData?._id}</strong>
                   </p>
                   <p className="text-xs text-slate-600 mt-1">
-                    Dispatched GPS Coordinates: <strong>{coordinates.lat.toFixed(5)}, {coordinates.lng.toFixed(5)}</strong>
+                    {t('sos.gpsCoords')}: <strong>{coordinates.lat.toFixed(5)}, {coordinates.lng.toFixed(5)}</strong>
                   </p>
                   <p className="text-xs text-slate-600 mt-1">
-                    Google Maps Link:{' '}
                     <a
                       href={`https://maps.google.com/?q=${coordinates.lat},${coordinates.lng}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-blue-600 underline font-semibold"
                     >
-                      View on Google Maps
+                      {t('sos.gmapsLink')}
                     </a>
                   </p>
                 </div>
@@ -118,7 +116,7 @@ const ElderSOS = () => {
                     onClick={resolveEmergency}
                     className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow text-sm"
                   >
-                    I Am Safe Now (Cancel / Resolve SOS)
+                    {t('sos.safeButton')}
                   </button>
                 </div>
               </div>
@@ -127,13 +125,13 @@ const ElderSOS = () => {
             {status === 'resolved' && (
               <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800">
                 <CheckCircle className="w-8 h-8 mx-auto text-emerald-600 mb-2" />
-                <h3 className="font-bold text-lg">Alert Marked as Resolved</h3>
-                <p className="text-xs mt-1">Your family and volunteers have been notified that you are safe.</p>
+                <h3 className="font-bold text-lg">{t('sos.resolvedTitle')}</h3>
+                <p className="text-xs mt-1">{t('sos.resolvedDesc')}</p>
                 <button
                   onClick={() => setStatus('idle')}
                   className="mt-4 px-4 py-2 bg-emerald-700 text-white text-xs font-bold rounded-lg"
                 >
-                  Reset Button
+                  {t('sos.resetButton')}
                 </button>
               </div>
             )}
@@ -142,8 +140,8 @@ const ElderSOS = () => {
 
         {/* Safety Disclaimer */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 text-xs text-slate-500">
-          <p className="font-semibold text-slate-700 mb-1">Important Safety Disclaimer:</p>
-          This platform coordinates with local volunteers and family caregivers. In life-threatening emergencies requiring immediate paramedic or law enforcement response, please call your local official emergency telephone number directly (112 / 911 / 108).
+          <p className="font-semibold text-slate-700 mb-1">{t('sos.disclaimerTitle')}</p>
+          {t('sos.disclaimerText')}
         </div>
       </div>
     </DashboardLayout>
@@ -151,4 +149,3 @@ const ElderSOS = () => {
 };
 
 export default ElderSOS;
-

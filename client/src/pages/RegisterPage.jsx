@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { Heart, User, Mail, Lock, Phone, MapPin, AlertCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 
 const RegisterPage = () => {
   const [searchParams] = useSearchParams();
   const defaultRole = searchParams.get('role') || 'elder';
+  const { register, loading, language } = useAuth();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -20,12 +24,10 @@ const RegisterPage = () => {
     emergencyContactName: '',
     emergencyContactPhone: '',
     mobilityRequirements: 'None',
-    preferredLanguage: 'en',
+    preferredLanguage: language || 'en',
   });
 
   const [error, setError] = useState('');
-  const { register, loading } = useAuth();
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,7 +46,7 @@ const RegisterPage = () => {
       address: formData.address,
       city: formData.city,
       role: formData.role,
-      preferredLanguage: formData.preferredLanguage,
+      preferredLanguage: language || formData.preferredLanguage || 'en',
       emergencyContact: {
         name: formData.emergencyContactName,
         phone: formData.emergencyContactPhone,
@@ -69,8 +71,8 @@ const RegisterPage = () => {
             <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
               <Heart className="w-6 h-6 fill-blue-600" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900">Create Your Account</h2>
-            <p className="text-sm text-slate-500 mt-1">Join Eldercare Connect platform</p>
+            <h2 className="text-2xl font-bold text-slate-900">{t('auth.createAccount')}</h2>
+            <p className="text-sm text-slate-500 mt-1">{t('auth.registerSubtitle')}</p>
           </div>
 
           {error && (
@@ -82,24 +84,24 @@ const RegisterPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Select Your Role</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.selectRole')}</label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-blue-500"
               >
-                <option value="elder">Elderly User (Senior Citizen)</option>
-                <option value="family">Family Member</option>
-                <option value="volunteer">Volunteer (Community Helper)</option>
-                <option value="caregiver">Professional Caregiver</option>
-                <option value="admin">Administrator</option>
+                <option value="elder">{t('roles.elder')}</option>
+                <option value="family">{t('roles.family')}</option>
+                <option value="volunteer">{t('roles.volunteer')}</option>
+                <option value="caregiver">{t('roles.caregiver')}</option>
+                <option value="admin">{t('roles.admin')}</option>
               </select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.fullName')}</label>
                 <input
                   type="text"
                   required
@@ -112,7 +114,7 @@ const RegisterPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Email</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.emailLabel')}</label>
                 <input
                   type="email"
                   required
@@ -127,7 +129,7 @@ const RegisterPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.passwordLabel')}</label>
                 <input
                   type="password"
                   required
@@ -140,14 +142,14 @@ const RegisterPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.phoneNumber')}</label>
                 <input
                   type="tel"
                   required
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+91 9876543210"
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -155,7 +157,7 @@ const RegisterPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Age</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.age')}</label>
                 <input
                   type="number"
                   required
@@ -167,40 +169,40 @@ const RegisterPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">City</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.city')}</label>
                 <input
                   type="text"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="e.g. Coimbatore"
+                  placeholder="e.g. Coimbatore / Chennai"
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Address</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">{t('auth.address')}</label>
               <input
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="Street address for assistance & emergency dispatch"
+                placeholder={t('auth.addressPlaceholder')}
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             {formData.role === 'elder' && (
               <div className="p-4 bg-blue-50/60 rounded-xl border border-blue-100 space-y-3">
-                <h4 className="text-xs font-bold text-blue-900 uppercase">Elderly Emergency Contact</h4>
+                <h4 className="text-xs font-bold text-blue-900 uppercase">{t('auth.emergencyContactHeader')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <input
                     type="text"
                     name="emergencyContactName"
                     value={formData.emergencyContactName}
                     onChange={handleChange}
-                    placeholder="Contact person name"
+                    placeholder={t('auth.contactPersonName')}
                     className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
                   />
                   <input
@@ -208,7 +210,7 @@ const RegisterPage = () => {
                     name="emergencyContactPhone"
                     value={formData.emergencyContactPhone}
                     onChange={handleChange}
-                    placeholder="Contact phone"
+                    placeholder={t('auth.contactPhone')}
                     className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
                   />
                 </div>
@@ -220,14 +222,14 @@ const RegisterPage = () => {
               disabled={loading}
               className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition disabled:opacity-50 mt-4"
             >
-              {loading ? 'Creating Account...' : 'Complete Registration'}
+              {loading ? t('auth.completingReg') : t('auth.completeRegBtn')}
             </button>
           </form>
 
           <p className="text-center text-sm text-slate-600 mt-6">
-            Already registered?{' '}
+            {t('auth.alreadyRegistered')}{' '}
             <Link to="/login" className="text-blue-600 font-semibold hover:underline">
-              Sign in
+              {t('auth.loginLink')}
             </Link>
           </p>
         </div>
@@ -237,4 +239,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-

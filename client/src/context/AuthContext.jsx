@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import socket from '../services/socket';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const { i18n } = useTranslation();
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('userInfo');
     return saved ? JSON.parse(saved) : null;
@@ -12,7 +14,38 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [largeText, setLargeText] = useState(() => localStorage.getItem('accessibility_largeText') === 'true');
   const [highContrast, setHighContrast] = useState(() => localStorage.getItem('accessibility_highContrast') === 'true');
-  const [language, setLanguage] = useState(() => localStorage.getItem('eldercare_lang') || 'en');
+  const [language, setLanguageState] = useState(() => {
+    return localStorage.getItem('eldercare_lang') || 'en';
+  });
+
+  // Sync language with i18n and localStorage
+  const setLanguage = async (newLang) => {
+    const lang = newLang === 'ta' ? 'ta' : 'en';
+    setLanguageState(lang);
+    localStorage.setItem('eldercare_lang', lang);
+    await i18n.changeLanguage(lang);
+
+    // If user is logged in, sync with MongoDB
+    if (user && user._id) {
+      try {
+        await api.put('/auth/profile', { preferredLanguage: lang });
+        const updatedUser = { ...user, preferredLanguage: lang };
+        setUser(updatedUser);
+        localStorage.setItem('userInfo', JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error('Failed to sync language to database:', err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (user && user.preferredLanguage) {
+      const preferred = user.preferredLanguage === 'ta' ? 'ta' : 'en';
+      setLanguageState(preferred);
+      localStorage.setItem('eldercare_lang', preferred);
+      i18n.changeLanguage(preferred);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user && user._id) {
@@ -44,6 +77,9 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/auth/login', { email, password });
       setUser(res.data);
       localStorage.setItem('userInfo', JSON.stringify(res.data));
+      if (res.data.preferredLanguage) {
+        setLanguage(res.data.preferredLanguage);
+      }
       setLoading(false);
       return res.data;
     } catch (err) {
@@ -58,6 +94,9 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/auth/register', userData);
       setUser(res.data);
       localStorage.setItem('userInfo', JSON.stringify(res.data));
+      if (res.data.preferredLanguage) {
+        setLanguage(res.data.preferredLanguage);
+      }
       setLoading(false);
       return res.data;
     } catch (err) {
@@ -95,4 +134,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-

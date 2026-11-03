@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
-import { Pill, Plus, CheckCircle, Clock, Trash2 } from 'lucide-react';
+import { Pill, Plus, CheckCircle, Clock } from 'lucide-react';
 
 const ElderMedicines = () => {
+  const { t } = useTranslation();
   const [medicines, setMedicines] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -57,9 +59,9 @@ const ElderMedicines = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200">
           <div>
-            <h1 className="text-2xl font-black text-slate-900">Medicine Reminders & Schedule</h1>
+            <h1 className="text-2xl font-black text-slate-900">{t('medicines.title')}</h1>
             <p className="text-xs text-slate-500 mt-1">
-              Automated reminders alert you when it's time to take your doses.
+              {t('medicines.subtitle')}
             </p>
           </div>
           <button
@@ -67,7 +69,7 @@ const ElderMedicines = () => {
             className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Prescription</span>
+            <span>{t('medicines.addPrescription')}</span>
           </button>
         </div>
 
@@ -85,14 +87,14 @@ const ElderMedicines = () => {
                   </span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">{med.name}</h3>
-                <p className="text-xs font-semibold text-blue-600 mt-0.5">Dosage: {med.dosage}</p>
-                <p className="text-xs text-slate-500 mt-2">Instructions: {med.instructions}</p>
+                <p className="text-xs font-semibold text-blue-600 mt-0.5">{t('medicines.dosage')}: {med.dosage}</p>
+                <p className="text-xs text-slate-500 mt-2">{med.instructions}</p>
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center text-xs text-slate-600">
                   <Clock className="w-4 h-4 mr-1 text-slate-400" />
-                  <span>Times: {med.scheduleTimes?.join(', ')}</span>
+                  <span>{t('elder.times')}: {med.scheduleTimes?.join(', ')}</span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  Remaining Stock: <strong className="text-slate-800">{med.stockRemaining} pills</strong>
+                  {t('medicines.remainingStock')}: <strong className="text-slate-800">{med.stockRemaining} {t('medicines.pills')}</strong>
                 </div>
               </div>
 
@@ -102,7 +104,7 @@ const ElderMedicines = () => {
                   className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-2 shadow-sm transition"
                 >
                   <CheckCircle className="w-4 h-4" />
-                  <span>Mark as Taken</span>
+                  <span>{t('elder.markTaken')}</span>
                 </button>
               </div>
             </div>
@@ -113,10 +115,10 @@ const ElderMedicines = () => {
         {showModal && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl">
-              <h3 className="text-xl font-bold text-slate-900 mb-4">Add New Medicine</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">{t('medicines.addNew')}</h3>
               <form onSubmit={handleCreate} className="space-y-4 text-xs font-semibold">
                 <div>
-                  <label className="block text-slate-700 mb-1">Medicine Name</label>
+                  <label className="block text-slate-700 mb-1">{t('medicines.nameLabel')}</label>
                   <input
                     type="text"
                     required
@@ -127,7 +129,7 @@ const ElderMedicines = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 mb-1">Dosage</label>
+                  <label className="block text-slate-700 mb-1">{t('medicines.dosageLabel')}</label>
                   <input
                     type="text"
                     required
@@ -138,7 +140,7 @@ const ElderMedicines = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 mb-1">Daily Schedule Times (Comma separated, 24h format)</label>
+                  <label className="block text-slate-700 mb-1">{t('medicines.scheduleLabel')}</label>
                   <input
                     type="text"
                     required
@@ -149,7 +151,7 @@ const ElderMedicines = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 mb-1">Special Instructions</label>
+                  <label className="block text-slate-700 mb-1">{t('medicines.instructionsLabel')}</label>
                   <input
                     type="text"
                     value={formData.instructions}
@@ -158,7 +160,7 @@ const ElderMedicines = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 mb-1">Starting Stock Quantity</label>
+                  <label className="block text-slate-700 mb-1">{t('medicines.stockLabel')}</label>
                   <input
                     type="number"
                     value={formData.stockRemaining}
@@ -173,13 +175,13 @@ const ElderMedicines = () => {
                     onClick={() => setShowModal(false)}
                     className="px-4 py-2 border border-slate-300 rounded-xl text-slate-600"
                   >
-                    Cancel
+                    {t('medicines.cancel')}
                   </button>
                   <button
                     type="submit"
                     className="px-5 py-2 bg-blue-600 text-white rounded-xl font-bold"
                   >
-                    Save Prescription
+                    {t('medicines.save')}
                   </button>
                 </div>
               </form>
@@ -192,4 +194,3 @@ const ElderMedicines = () => {
 };
 
 export default ElderMedicines;
-

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    font-family: 'Noto Sans Tamil', 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+}
+
 /* Senior Citizen Accessibility Modes */
 .accessibility-large-text {
   font-size: 118% !important;
@@ -21,4 +29,3 @@
   transition-property: background-color, border-color, color, fill, stroke;
   transition-duration: 150ms;
 }
-

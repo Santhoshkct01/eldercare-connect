@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { HeartPulse, Check, Smile, Meh, Frown, Droplet, Moon, Activity } from 'lucide-react';
 
 const ElderWellness = () => {
+  const { t } = useTranslation();
+  const { language } = useAuth();
   const [history, setHistory] = useState([]);
+  const locale = language === 'ta' ? 'ta-IN' : 'en-IN';
+
   const [formData, setFormData] = useState({
     mood: 'Good',
     sleepHours: 7,
@@ -51,6 +57,14 @@ const ElderWellness = () => {
     }
   };
 
+  const moodKeys = [
+    { key: 'great', val: 'Great' },
+    { key: 'good', val: 'Good' },
+    { key: 'okay', val: 'Okay' },
+    { key: 'unwell', val: 'Unwell' },
+    { key: 'inPain', val: 'In Pain' },
+  ];
+
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-4xl mx-auto">
@@ -60,9 +74,9 @@ const ElderWellness = () => {
               <HeartPulse className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-black text-slate-900">Daily Wellness Check-In</h1>
+              <h1 className="text-2xl font-black text-slate-900">{t('wellness.title')}</h1>
               <p className="text-xs text-slate-500">
-                Log your daily mood, sleep, and vitals to keep your family and caregivers updated.
+                {t('wellness.subtitle')}
               </p>
             </div>
           </div>
@@ -71,26 +85,26 @@ const ElderWellness = () => {
         {success && (
           <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center space-x-2 text-sm font-semibold">
             <Check className="w-5 h-5 text-emerald-600" />
-            <span>Today's wellness check logged successfully!</span>
+            <span>{t('wellness.success')}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-3">How are you feeling today?</label>
+            <label className="block text-xs font-bold text-slate-700 uppercase mb-3">{t('wellness.moodQuestion')}</label>
             <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-              {['Great', 'Good', 'Okay', 'Unwell', 'In Pain'].map((m) => (
+              {moodKeys.map(({ key, val }) => (
                 <button
                   type="button"
-                  key={m}
-                  onClick={() => setFormData({ ...formData, mood: m })}
+                  key={val}
+                  onClick={() => setFormData({ ...formData, mood: val })}
                   className={`p-3 rounded-2xl border text-center transition ${
-                    formData.mood === m
+                    formData.mood === val
                       ? 'bg-blue-600 border-blue-600 text-white font-bold shadow-md'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <p className="text-xs">{m}</p>
+                  <p className="text-xs">{t(`wellness.moods.${key}`)}</p>
                 </button>
               ))}
             </div>
@@ -100,7 +114,7 @@ const ElderWellness = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
               <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 mb-2">
                 <Moon className="w-4 h-4 text-purple-600" />
-                <span>Sleep Hours (Last Night)</span>
+                <span>{t('wellness.sleepHours')}</span>
               </label>
               <input
                 type="number"
@@ -115,7 +129,7 @@ const ElderWellness = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
               <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 mb-2">
                 <Droplet className="w-4 h-4 text-blue-600" />
-                <span>Water Intake (Glasses)</span>
+                <span>{t('wellness.waterIntake')}</span>
               </label>
               <input
                 type="number"
@@ -132,7 +146,7 @@ const ElderWellness = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
               <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 mb-2">
                 <Activity className="w-4 h-4 text-red-600" />
-                <span>Blood Pressure (Systolic / Diastolic)</span>
+                <span>{t('wellness.bloodPressure')}</span>
               </label>
               <div className="flex space-x-2">
                 <input
@@ -155,7 +169,7 @@ const ElderWellness = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
               <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 mb-2">
                 <Activity className="w-4 h-4 text-amber-600" />
-                <span>Blood Sugar Level (mg/dL)</span>
+                <span>{t('wellness.sugarLevel')}</span>
               </label>
               <input
                 type="number"
@@ -168,12 +182,12 @@ const ElderWellness = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Daily Notes / Symptoms</label>
+            <label className="block text-xs font-bold text-slate-700 uppercase mb-2">{t('wellness.notes')}</label>
             <textarea
               rows="2"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="e.g. Mild knee stiffness, walked in garden for 20 minutes"
+              placeholder={t('wellness.notesPlaceholder')}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm"
             ></textarea>
           </div>
@@ -182,25 +196,25 @@ const ElderWellness = () => {
             type="submit"
             className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition"
           >
-            Save Today's Check-In
+            {t('wellness.save')}
           </button>
         </form>
 
         {/* Recent logs */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200">
-          <h3 className="font-bold text-slate-900 text-base mb-4">Past Wellness History</h3>
+          <h3 className="font-bold text-slate-900 text-base mb-4">{t('wellness.historyTitle')}</h3>
           <div className="space-y-3">
             {history.slice(0, 5).map((log) => (
               <div key={log._id} className="p-4 bg-slate-50 rounded-2xl flex justify-between items-center text-xs">
                 <div>
                   <span className="font-bold text-slate-800">
-                    {new Date(log.date || log.createdAt).toLocaleDateString()}
+                    {new Date(log.date || log.createdAt).toLocaleDateString(locale)}
                   </span>
                   <span className="ml-3 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md font-semibold">
-                    Mood: {log.mood}
+                    {log.mood}
                   </span>
                   <span className="ml-2 text-slate-500">
-                    Sleep: {log.sleepHours} hrs • BP: {log.bloodPressure?.systolic || 120}/{log.bloodPressure?.diastolic || 80}
+                    {t('family.sleepDuration')}: {log.sleepHours} {t('wellness.hours')} • BP: {log.bloodPressure?.systolic || 120}/{log.bloodPressure?.diastolic || 80}
                   </span>
                 </div>
                 {log.notes && <span className="text-slate-400 italic truncate max-w-xs">{log.notes}</span>}
@@ -214,4 +228,3 @@ const ElderWellness = () => {
 };
 
 export default ElderWellness;
-

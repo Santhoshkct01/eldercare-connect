@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { HandHeart, Plus, Clock, MapPin, CheckCircle } from 'lucide-react';
 
 const ElderRequests = () => {
+  const { t } = useTranslation();
+  const { language } = useAuth();
   const [requests, setRequests] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const locale = language === 'ta' ? 'ta-IN' : 'en-IN';
+
   const [formData, setFormData] = useState({
     category: 'Grocery Shopping',
     description: '',
@@ -47,9 +53,9 @@ const ElderRequests = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200">
           <div>
-            <h1 className="text-2xl font-black text-slate-900">Volunteer Assistance Requests</h1>
+            <h1 className="text-2xl font-black text-slate-900">{t('requests.title')}</h1>
             <p className="text-xs text-slate-500 mt-1">
-              Ask for help with groceries, hospital escorts, companionship, or local errands.
+              {t('requests.subtitle')}
             </p>
           </div>
           <button
@@ -57,7 +63,7 @@ const ElderRequests = () => {
             className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            <span>Create New Request</span>
+            <span>{t('requests.createNew')}</span>
           </button>
         </div>
 
@@ -72,14 +78,14 @@ const ElderRequests = () => {
                   </span>
                   <span className="text-xs text-slate-400 font-mono">#{req.requestId}</span>
                   <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[11px] font-semibold">
-                    Priority: {req.priority}
+                    {t('requests.priority')}: {req.priority}
                   </span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">{req.description}</h3>
                 <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
                   <span className="flex items-center">
                     <Clock className="w-3.5 h-3.5 mr-1" />
-                    {new Date(req.preferredDate).toLocaleDateString()} at {req.preferredTime}
+                    {new Date(req.preferredDate).toLocaleDateString(locale)} {t('elder.at')} {req.preferredTime}
                   </span>
                   {req.location?.address && (
                     <span className="flex items-center">
@@ -96,12 +102,12 @@ const ElderRequests = () => {
                   req.status === 'Accepted' || req.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
                   'bg-amber-100 text-amber-800'
                 }`}>
-                  Status: {req.status}
+                  {t('requests.status')}: {req.status}
                 </span>
 
                 {req.assignedVolunteer && (
                   <p className="text-xs text-slate-600">
-                    Assigned: <strong>{req.assignedVolunteer.name}</strong> ({req.assignedVolunteer.phone})
+                    {t('requests.assigned')}: <strong>{req.assignedVolunteer.name}</strong> ({req.assignedVolunteer.phone})
                   </p>
                 )}
               </div>
@@ -112,39 +118,40 @@ const ElderRequests = () => {
         {showModal && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl">
-              <h3 className="text-xl font-bold text-slate-900 mb-4">Request Assistance</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">{t('requests.createTitle')}</h3>
               <form onSubmit={handleCreate} className="space-y-4 text-xs font-semibold">
                 <div>
-                  <label className="block text-slate-700 mb-1">Category</label>
+                  <label className="block text-slate-700 mb-1">{t('requests.categoryLabel')}</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full px-3 py-2 border rounded-xl"
                   >
-                    <option value="Grocery Shopping">Grocery Shopping</option>
-                    <option value="Hospital Visit">Hospital Visit</option>
-                    <option value="Doctor Appointment">Doctor Appointment</option>
-                    <option value="Medicine Collection">Medicine Collection</option>
-                    <option value="Transportation">Transportation</option>
-                    <option value="Household Assistance">Household Assistance</option>
-                    <option value="Companionship">Companionship</option>
-                    <option value="Other">Other</option>
+                    <option value="Grocery Shopping">{t('requests.categories.grocery')}</option>
+                    <option value="Hospital Visit">{t('requests.categories.hospital')}</option>
+                    <option value="Doctor Appointment">{t('requests.categories.doctor')}</option>
+                    <option value="Medicine Collection">{t('requests.categories.medicine')}</option>
+                    <option value="Transportation">{t('requests.categories.transport')}</option>
+                    <option value="Household Assistance">{t('requests.categories.household')}</option>
+                    <option value="Companionship">{t('requests.categories.companionship')}</option>
+                    <option value="Emergency Assistance">{t('requests.categories.emergency')}</option>
+                    <option value="Other">{t('requests.categories.other')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-700 mb-1">Description / Details</label>
+                  <label className="block text-slate-700 mb-1">{t('requests.descLabel')}</label>
                   <textarea
                     required
                     rows="3"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe what help you need..."
+                    placeholder={t('requests.descPlaceholder')}
                     className="w-full px-3 py-2 border rounded-xl"
                   ></textarea>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-700 mb-1">Preferred Date</label>
+                    <label className="block text-slate-700 mb-1">{t('requests.dateLabel')}</label>
                     <input
                       type="date"
                       required
@@ -154,7 +161,7 @@ const ElderRequests = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-700 mb-1">Preferred Time</label>
+                    <label className="block text-slate-700 mb-1">{t('requests.timeLabel')}</label>
                     <input
                       type="text"
                       required
@@ -166,12 +173,12 @@ const ElderRequests = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-slate-700 mb-1">Address / Pickup Place</label>
+                  <label className="block text-slate-700 mb-1">{t('requests.addressLabel')}</label>
                   <input
                     type="text"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Where should the volunteer meet you?"
+                    placeholder={t('requests.addressPlaceholder')}
                     className="w-full px-3 py-2 border rounded-xl"
                   />
                 </div>
@@ -182,13 +189,13 @@ const ElderRequests = () => {
                     onClick={() => setShowModal(false)}
                     className="px-4 py-2 border border-slate-300 rounded-xl text-slate-600"
                   >
-                    Cancel
+                    {t('medicines.cancel')}
                   </button>
                   <button
                     type="submit"
                     className="px-5 py-2 bg-teal-600 text-white rounded-xl font-bold"
                   >
-                    Submit Request
+                    {t('requests.submit')}
                   </button>
                 </div>
               </form>
@@ -201,4 +208,3 @@ const ElderRequests = () => {
 };
 
 export default ElderRequests;
-

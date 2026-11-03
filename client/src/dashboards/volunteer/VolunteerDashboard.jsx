@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { HandHeart, CheckCircle, Clock, MapPin, ToggleLeft, ToggleRight, Phone, ShieldAlert } from 'lucide-react';
 
 const VolunteerDashboard = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, language } = useAuth();
+  const { t } = useTranslation();
   const [requests, setRequests] = useState([]);
   const [isAvailable, setIsAvailable] = useState(user?.isVolunteerAvailable ?? true);
   const [loading, setLoading] = useState(true);
+  const locale = language === 'ta' ? 'ta-IN' : 'en-IN';
 
   useEffect(() => {
     fetchRequests();
@@ -53,11 +56,11 @@ const VolunteerDashboard = () => {
         <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-3xl p-6 md:p-8 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider">
-              Community Volunteer Portal
+              {t('volunteer.badge')}
             </span>
-            <h1 className="text-3xl font-black mt-2">Welcome, {user?.name}!</h1>
+            <h1 className="text-3xl font-black mt-2">{t('volunteer.welcome', { name: user?.name || '' })}</h1>
             <p className="mt-1 text-teal-100 text-sm">
-              Status: {user?.isVerifiedVolunteer ? 'Verified Volunteer ✅' : 'Pending Admin Verification ⏳'} • Rating: {user?.volunteerRating || '5.0'} ⭐
+              {user?.isVerifiedVolunteer ? t('volunteer.verified') : t('volunteer.pending')} • {t('volunteer.rating')}: {user?.volunteerRating || '5.0'} ⭐
             </p>
           </div>
 
@@ -69,19 +72,19 @@ const VolunteerDashboard = () => {
             }`}
           >
             {isAvailable ? <ToggleRight className="w-5 h-5 text-emerald-600" /> : <ToggleLeft className="w-5 h-5" />}
-            <span>{isAvailable ? 'Available for Missions' : 'Currently Offline'}</span>
+            <span>{isAvailable ? t('volunteer.availableBtn') : t('volunteer.offlineBtn')}</span>
           </button>
         </div>
 
         {/* Requests Feed */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="font-bold text-slate-900 text-lg">Assistance Missions & Tasks</h3>
-            <span className="text-xs text-slate-500 font-semibold">{requests.length} Total</span>
+            <h3 className="font-bold text-slate-900 text-lg">{t('volunteer.tasksTitle')}</h3>
+            <span className="text-xs text-slate-500 font-semibold">{requests.length} {t('volunteer.total')}</span>
           </div>
 
           {requests.length === 0 ? (
-            <p className="text-center py-12 text-slate-400 text-sm">No tasks currently require assistance. Thank you for your service!</p>
+            <p className="text-center py-12 text-slate-400 text-sm">{t('volunteer.noTasks')}</p>
           ) : (
             <div className="space-y-4">
               {requests.map((req) => (
@@ -93,14 +96,14 @@ const VolunteerDashboard = () => {
                       </span>
                       <span className="text-xs font-mono text-slate-400">#{req.requestId}</span>
                       <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[11px] font-bold rounded">
-                        Priority: {req.priority}
+                        {t('requests.priority')}: {req.priority}
                       </span>
                     </div>
 
                     <h4 className="text-base font-bold text-slate-800">{req.description}</h4>
 
                     <div className="flex flex-wrap gap-4 text-xs text-slate-600">
-                      <span>Elder: <strong>{req.elder?.name}</strong></span>
+                      <span>{t('volunteer.elderLabel')}: <strong>{req.elder?.name}</strong></span>
                       <span className="flex items-center">
                         <Phone className="w-3.5 h-3.5 mr-1 text-slate-400" />
                         {req.elder?.phone}
@@ -111,7 +114,7 @@ const VolunteerDashboard = () => {
                       </span>
                       <span className="flex items-center">
                         <Clock className="w-3.5 h-3.5 mr-1 text-slate-400" />
-                        {new Date(req.preferredDate).toLocaleDateString()} at {req.preferredTime}
+                        {new Date(req.preferredDate).toLocaleDateString(locale)} {t('elder.at')} {req.preferredTime}
                       </span>
                     </div>
                   </div>
@@ -123,7 +126,7 @@ const VolunteerDashboard = () => {
                         onClick={() => handleUpdateStatus(req._id, 'Accepted')}
                         className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm"
                       >
-                        Accept Mission
+                        {t('volunteer.acceptMission')}
                       </button>
                     )}
                     {req.status === 'Accepted' && (
@@ -132,13 +135,13 @@ const VolunteerDashboard = () => {
                           onClick={() => handleUpdateStatus(req._id, 'On The Way')}
                           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold"
                         >
-                          On The Way
+                          {t('volunteer.onTheWay')}
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(req._id, 'Completed')}
                           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold"
                         >
-                          Mark Completed
+                          {t('volunteer.markCompleted')}
                         </button>
                       </>
                     )}
@@ -147,12 +150,12 @@ const VolunteerDashboard = () => {
                         onClick={() => handleUpdateStatus(req._id, 'Completed')}
                         className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold"
                       >
-                        Mark Completed
+                        {t('volunteer.markCompleted')}
                       </button>
                     )}
                     {req.status === 'Completed' && (
                       <span className="px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold flex items-center">
-                        <CheckCircle className="w-4 h-4 mr-1 text-emerald-600" /> Done
+                        <CheckCircle className="w-4 h-4 mr-1 text-emerald-600" /> {t('volunteer.done')}
                       </span>
                     )}
                   </div>
@@ -167,4 +170,3 @@ const VolunteerDashboard = () => {
 };
 
 export default VolunteerDashboard;
-
