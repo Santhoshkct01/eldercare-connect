@@ -29,3 +29,4 @@ The location automation logic strictly fulfills the business criteria:
 1. **Never auto-assigns outside 100 meters** or when coordinates are unavailable.
 2. **Automatically assigns** only when verified and available volunteers are within the same 100-meter threshold.
 3. Provides full human-in-the-loop oversight through the **Admin Manual Assignment Queue**.
+

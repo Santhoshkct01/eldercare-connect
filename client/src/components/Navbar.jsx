@@ -1,14 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Heart, Globe, Type, Eye, LogOut, Menu, X, ShieldAlert } from 'lucide-react';
+import api from '../services/api';
+import socket from '../services/socket';
+import {
+  Heart,
+  Globe,
+  Type,
+  Eye,
+  LogOut,
+  Menu,
+  X,
+  ShieldAlert,
+  Bell,
+  Check,
+  ExternalLink,
+} from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout, largeText, setLargeText, highContrast, setHighContrast, language, setLanguage } = useAuth();
   const { t } = useTranslation();
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+
+      // Join user-specific socket room
+      socket.emit('join_user_room', user._id);
+
+      socket.on('medicine_reminder', (data) => {
+        fetchNotifications();
+      });
+
+      return () => {
+        socket.off('medicine_reminder');
+      };
+    }
+  }, [user]);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get('/features/notifications');
+      const list = res.data || [];
+      setNotifications(list);
+      setUnreadCount(list.filter((n) => !n.isRead).length);
+    } catch (err) {
+      console.warn('Fetch notifications notice:', err.message);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await api.put(`/features/notifications/${id}/read`);
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleSOSQuick = () => {
     navigate('/elder/sos');
@@ -75,15 +132,83 @@ const Navbar = () => {
               </button>
             </div>
 
-            {/* User Navigation */}
+            {/* User Navigation & Notifications */}
             {user ? (
               <div className="flex items-center space-x-3 ml-4">
+                {/* Notification Bell Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                    className="p-2 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-xl relative transition"
+                    title="Notifications"
+                  >
+                    <Bell className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1 right-1 w-4 h-4 bg-rose-600 text-white rounded-full text-[10px] font-black flex items-center justify-center animate-pulse">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {notifDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-2xl py-2 z-50 text-xs">
+                      <div className="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+                        <span className="font-bold text-slate-800 text-sm">
+                          {language === 'ta' ? 'அறிவிப்புகள்' : 'Notifications'}
+                        </span>
+                        <span className="text-[11px] text-blue-600 font-semibold">
+                          {unreadCount} {language === 'ta' ? 'புதியவை' : 'unread'}
+                        </span>
+                      </div>
+
+                      <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                        {notifications.length === 0 ? (
+                          <div className="py-8 text-center text-slate-400">
+                            {language === 'ta' ? 'அறிவிப்புகள் எதுவும் இல்லை' : 'No notifications yet'}
+                          </div>
+                        ) : (
+                          notifications.slice(0, 8).map((n) => (
+                            <div
+                              key={n._id}
+                              className={`p-3 transition ${n.isRead ? 'bg-white opacity-80' : 'bg-blue-50/40'}`}
+                            >
+                              <div className="flex justify-between items-start gap-2">
+                                <p className="font-bold text-slate-900">{n.title}</p>
+                                {!n.isRead && (
+                                  <button
+                                    onClick={() => markAsRead(n._id)}
+                                    className="text-blue-600 hover:text-blue-800 text-[10px] font-bold"
+                                  >
+                                    <Check className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                              <p className="text-slate-600 mt-0.5 text-[11px]">{n.message}</p>
+                              {n.link && (
+                                <Link
+                                  to={n.link}
+                                  onClick={() => setNotifDropdownOpen(false)}
+                                  className="text-blue-600 font-bold hover:underline inline-flex items-center space-x-1 mt-1 text-[11px]"
+                                >
+                                  <span>{language === 'ta' ? 'பார்க்கவும்' : 'View Details'}</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </Link>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <Link
                   to={`/${user.role}/dashboard`}
                   className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-100"
                 >
                   {t('nav.dashboard')} ({t(`roles.${user.role}`)})
                 </Link>
+
                 {user.role === 'elder' && (
                   <button
                     onClick={handleSOSQuick}
@@ -93,6 +218,7 @@ const Navbar = () => {
                     <span>{t('nav.sos')}</span>
                   </button>
                 )}
+
                 <button
                   onClick={logout}
                   className="p-2 text-slate-500 hover:text-red-600 rounded-lg"

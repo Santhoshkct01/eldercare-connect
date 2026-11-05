@@ -86,3 +86,4 @@ Overall, the core architecture is well-structured and deployed. However, critica
    - Run unit test scripts for Haversine matching (<100m, >100m, missing GPS, unavailable volunteer, ranking).
    - Test request editing and cancellation lifecycle.
    - Verify frontend production build (`npm run build`).
+

@@ -28,10 +28,31 @@ Eldercare Connect supports **English** and **Tamil (தமிழ்)** across al
    - **Professional Caregiver**: Personalized care plans, clinical visit logging, and vitals monitoring.
    - **Administrator**: Live database metrics, volunteer verification pipeline, and crisis management.
 
-2. **Automations**:
-   - **Smart Medicine Reminders**: Automatic notifications scheduled via cron, alerts elder and escalates to family members if missed.
-   - **Emergency SOS Dispatch**: One-touch broadcast capturing GPS coordinates, alerting family, admins, and nearby volunteers.
-   - **Smart Volunteer Matching**: Evaluates distance using the Haversine formula and matches verified volunteers.
+2. **Automations & Notifications**:
+   - **Indian Standard Time (IST) Medicine Reminders**: Automatic 12-hour AM/PM scheduler polling every minute in `Asia/Kolkata` (UTC+05:30). Delivers in-app notification alerts, Socket.IO real-time dispatches, and Web Push notifications to desktop/Windows.
+   - **Dose Adherence & Missed Escalations**: Tracks individual doses (`Pending`, `Taken`, `Missed`). If unanswered after 15 minutes, automatically escalates missed medication alerts to authorized family members.
+   - **Location-Based Volunteer Matching**: Evaluates geographic proximity via the Haversine formula (Auto-assigns $\le$ 100m; routes $>100$m to Admin Manual Assignment Queue).
+   - **Emergency SOS Dispatch**: One-touch distress broadcast capturing live GPS coordinates, alerting family, admins, and nearby volunteers via WebSockets and Twilio SMS.
+
+---
+
+## ⏰ Indian Standard Time (IST) Medicine Reminder Setup
+
+Eldercare Connect employs an automated backend reminder daemon (`server/services/medicineReminderService.js`) running in `Asia/Kolkata` timezone:
+
+1. **12-Hour AM/PM Input**: The prescription modal accepts times in natural 12-hour format (`Hour: 1-12`, `Minute: 00-55`, `AM/PM`) and stores them unambiguously as 24-hour time strings (`10:00`, `22:00`).
+2. **Web Push Configuration**:
+   - Set the following environment variables in Render / `.env`:
+     ```bash
+     WEB_PUSH_PUBLIC_KEY=your_vapid_public_key
+     WEB_PUSH_PRIVATE_KEY=your_vapid_private_key
+     WEB_PUSH_SUBJECT=mailto:support@eldercare-connect.org
+     ```
+3. **Browser Push Notification**:
+   - Seniors click "Enable Push Alerts" on their Medicine page to register the background service worker (`sw.js`).
+   - Reminders trigger notifications even if the tab is inactive or minimized.
+4. **Idempotent Delivery**:
+   - Every scheduled dose utilizes a unique idempotency key (`rem_userId_medId_date_time`), guaranteeing exactly one reminder per scheduled dose per calendar day.
 
 3. **Accessibility**:
    - Web Speech API voice assistant ("Voice Companion")
