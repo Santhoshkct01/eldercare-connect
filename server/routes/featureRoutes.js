@@ -14,7 +14,6 @@ const {
   CommunityEvent,
   MedicalDocument,
   Expense,
-  CarePlan,
 } = require('../models/OtherModels');
 
 // APPOINTMENTS
@@ -201,29 +200,6 @@ router.delete('/medical-documents/:id', protect, async (req, res) => {
     res.json({ message: 'Document deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting document' });
-  }
-});
-
-// CARE PLANS
-router.get('/careplans', protect, async (req, res) => {
-  try {
-    const elder = req.user.role === 'elder' ? req.user._id : req.query.elderId;
-    const plans = await CarePlan.find(elder ? { elder } : {}).populate('elder caregiver', 'name phone email');
-    res.json(plans);
-  } catch (err) {
-    res.status(500).json({ message: 'Error fetching care plans' });
-  }
-});
-
-router.post('/careplans', protect, async (req, res) => {
-  try {
-    const plan = await CarePlan.create({
-      ...req.body,
-      caregiver: req.user._id,
-    });
-    res.status(201).json(plan);
-  } catch (err) {
-    res.status(500).json({ message: 'Error creating care plan' });
   }
 });
 

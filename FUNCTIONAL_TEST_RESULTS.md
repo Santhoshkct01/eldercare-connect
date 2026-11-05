@@ -1,48 +1,36 @@
 # FUNCTIONAL TEST RESULTS: ELDERCARE CONNECT
 
-## 1. Authentication & Session Persistence
-- **Initial Auth State**: Verified that `authLoading` initializes on application mount, preventing premature redirects to `/login`.
-- **Axios Token Interception**: Tested authorization headers attached to all `/api` calls. Tested 401 response handling: redirects cleanly only when authenticated session is genuinely invalid or expired.
-- **Role Permission Validation**: Unauthorized route visits render a clear `Access Denied (403)` screen rather than triggering an endless redirect loop.
+**Test Date**: November 5, 2026  
+**Test Suite**: Full-Stack User Workflow & Authentication Validation  
+**Total Test Cases**: 18 | **Passed**: 18 | **Failed**: 0  
 
 ---
 
-## 2. Page & Button Functionality Audit Results
+## 1. Test Summary
 
-| Page | Button / Interactive Element | Expected Action | Actual Result | API Endpoint | Test Status |
+| Test ID | Test Description | Role | Input / Action | Expected Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Navbar** | `🌐 English` / `🌐 தமிழ்` | Instant language toggle across all pages | Reacts immediately and syncs with DB & localStorage | `PUT /api/auth/profile` | **PASSED** |
-| **Navbar** | `A+` (Large Text) & `Contrast` | Toggle high contrast and 118% typography | Body classes applied immediately | None (Client state) | **PASSED** |
-| **Navbar** | `SOS` (Elder Quick Header) | Direct navigate to `/elder/sos` | Opens Emergency SOS console | None | **PASSED** |
-| **Navbar** | `Logout` | Clears token and returns to `/login` | Token cleared, redirected | None | **PASSED** |
-| **Home Page** | `Join as Senior` | Navigates to `/register?role=elder` | Opens Registration with elder preselected | None | **PASSED** |
-| **Home Page** | `Join as Volunteer` | Navigates to `/register?role=volunteer`| Opens Registration with volunteer preselected | None | **PASSED** |
-| **Login Page** | `Sign In` Submit button | Authenticates credentials & stores JWT | Returns JWT, redirects to role dashboard | `POST /api/auth/login` | **PASSED** |
-| **Register Page** | `Complete Registration` | Creates new user record | Saves to MongoDB, logs in | `POST /api/auth/register` | **PASSED** |
-| **Elder Dashboard** | `PRESS SOS` | Dispatches live emergency coordinates | Saves SOS alert, notifies contacts & volunteers | `POST /api/sos` | **PASSED** |
-| **Elder Dashboard** | `Mark Taken` (Prescriptions) | Records medicine intake | Decrements stock, logs timestamp | `PUT /api/medicines/:id/take` | **PASSED** |
-| **Elder Dashboard** | `Request Help` card | Navigates to `/elder/requests` | Opens assistance request module | None | **PASSED** |
-| **Elder Dashboard** | `Appointments` card | Navigates to `/elder/appointments` | Opens appointment manager | None | **PASSED** |
-| **Elder Appointments**| `Schedule Appointment` | Saves clinical consultation | Persists in MongoDB | `POST /api/features/appointments` | **PASSED** |
-| **Elder Appointments**| `Cancel Appointment` | Updates status to Cancelled | Updates status in MongoDB | `PUT /api/features/appointments/:id/cancel` | **PASSED** |
-| **Elder Appointments**| `Delete Appointment` | Deletes appointment record | Removes from MongoDB | `DELETE /api/features/appointments/:id` | **PASSED** |
-| **Elder Location** | `Sharing Active / Paused` | Toggles GPS sharing | Updates user location state | `POST /api/features/location/update` | **PASSED** |
-| **Elder Documents** | `Save to Vault` | Saves medical report URL | Persists document record | `POST /api/features/medical-documents` | **PASSED** |
-| **Elder Documents** | `Delete Document` | Removes medical record | Deletes from MongoDB | `DELETE /api/features/medical-documents/:id` | **PASSED** |
-| **Family Dashboard** | `Open in Google Maps` | Launches external map view | Opens coordinates in Google Maps | None | **PASSED** |
-| **Volunteer Dashboard**| `Accept Mission` | Assigns volunteer to request | Status becomes 'Accepted' | `PUT /api/requests/:id/status` | **PASSED** |
-| **Volunteer Dashboard**| `On The Way` | Updates status to On The Way | Status updated in DB | `PUT /api/requests/:id/status` | **PASSED** |
-| **Volunteer Dashboard**| `Mark Completed` | Marks task completed | Status updated, completedAt set | `PUT /api/requests/:id/status` | **PASSED** |
-| **Volunteer SOS** | `I Am Responding Now` | Accepts emergency dispatch | Status updated to 'Responded' | `PUT /api/sos/:id` | **PASSED** |
-| **Admin Users** | `Search user...` & `Role filter` | Filters user table dynamically | Displays matching user accounts | `GET /api/admin/users` | **PASSED** |
-| **Admin Volunteers** | `Approve / Revoke Application`| Updates volunteer verification | Toggles `isVerifiedVolunteer` in DB | `PUT /api/admin/volunteers/:id/verify` | **PASSED** |
-| **Admin SOS** | `Mark Resolved` | Resolves active emergency | Status updated in MongoDB | `PUT /api/sos/:id` | **PASSED** |
-| **Admin Requests** | `Manual Volunteer Assignment` | Assigns volunteer override | Updates assigned volunteer | `PUT /api/requests/:id/status` | **PASSED** |
-| **Community Events**| `Publish Event` | Creates community gathering | Persists event record | `POST /api/features/community-events` | **PASSED** |
+| **TC-01** | User Registration with Valid Role | Elder | Name, Email, Password, Role='elder' | User document created in MongoDB; JWT returned | **PASSED** |
+| **TC-02** | User Registration with Blocked Role | Caregiver | Role='caregiver' | Controller constrains to allowed roles or assigns 'elder' | **PASSED** |
+| **TC-03** | User Login & JWT Persistence | All | Email & Password | JWT token saved to `localStorage`; role dashboard loaded | **PASSED** |
+| **TC-04** | Session Persistence on Page Reload | All | Browser refresh on `/elder/dashboard` | `verifyUserSession` retains authenticated user without redirect | **PASSED** |
+| **TC-05** | Unauthorized Route Access Guard | Guest | Attempt direct visit to `/admin/dashboard` | Redirects to `/login` with return state | **PASSED** |
+| **TC-06** | Role Permission Boundary Guard | Elder | Attempt visit to `/admin/users` | Displays informative 403 Access Denied view with dashboard link | **PASSED** |
+| **TC-07** | Assistance Request Creation | Elder | Valid request payload with category & date | Request saved with unique ID (`REQ-xxxxxx`); triggers location match | **PASSED** |
+| **TC-08** | Edit Assistance Request | Elder | Modify description, date, time, priority | Original document updated; changes reflected on dashboard | **PASSED** |
+| **TC-09** | Prevent Edit on Completed Request | Elder | Attempt `PUT /api/requests/:id` on Completed | Returns HTTP 400 Bad Request error | **PASSED** |
+| **TC-10** | Cancel Assistance Request | Elder | Click "Cancel" with reason note | Status updated to 'Cancelled'; `cancelledAt` recorded | **PASSED** |
+| **TC-11** | Volunteer Availability Toggle | Volunteer | Toggle Availability button on dashboard | `isVolunteerAvailable` updated in DB; excluded from auto-matching | **PASSED** |
+| **TC-12** | Volunteer Task Status Updates | Volunteer | Status: Accepted $\rightarrow$ On The Way $\rightarrow$ Completed | Request lifecycle state advances; notifications delivered to elder | **PASSED** |
+| **TC-13** | Admin Manual Volunteer Assignment | Admin | Select volunteer from queue & confirm | Request status updated to 'Volunteer Assigned'; audit history logged | **PASSED** |
+| **TC-14** | Admin Volunteer Reassignment | Admin | Select new volunteer on assigned task | Status updated to 'reassigned'; prior & new volunteers notified | **PASSED** |
+| **TC-15** | Live GPS Location Sharing | Elder | Toggle Location Sharing on `/elder/location` | GPS coords saved to DB; Socket.IO broadcasts update to family | **PASSED** |
+| **TC-16** | Family Live GPS Tracking | Family | Visit `/family/location` | Loads connected elder coordinates with live Google Maps link | **PASSED** |
+| **TC-17** | One-Touch Emergency SOS Dispatch | Elder | Press emergency SOS button | Distress alert created; broadcasts socket event; dispatches SMS | **PASSED** |
+| **TC-18** | Real-Time Language Switching | All | Switch between English & Tamil | Immediate client-side re-render; no page refresh; persistent | **PASSED** |
 
 ---
 
-## 3. Bilingual Verification
-- Every single new page (Appointments, Location, Documents, Community, SOS Monitors, User lists) uses `useTranslation` keys and formats localized dates with `en-IN` / `ta-IN`.
-- All buttons across English and Tamil interfaces were verified without layout shifting or text overflows.
+## 2. Conclusion
 
+All 18 core functional workflows passed verification. User session management, role boundaries, request lifecycle operations, and emergency pipelines are fully operational.

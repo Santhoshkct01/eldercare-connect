@@ -21,7 +21,6 @@
     "elder": "Elderly User",
     "family": "Family Member",
     "volunteer": "Volunteer",
-    "caregiver": "Caregiver",
     "admin": "Administrator"
   },
   "sidebar": {
@@ -45,10 +44,6 @@
     "availableTasks": "Available Tasks",
     "sosDispatches": "Emergency SOS Dispatches",
     "completedMissions": "Completed Missions",
-    "caregiverDashboard": "Caregiver Dashboard",
-    "assignedElders": "Assigned Elders",
-    "carePlans": "Care Plans",
-    "healthLogs": "Health Logs",
     "adminOverview": "Admin Overview",
     "userManagement": "User Management",
     "volunteerApprovals": "Volunteer Approvals",
@@ -262,16 +257,6 @@
     "onTheWay": "On The Way",
     "markCompleted": "Mark Completed",
     "done": "Done"
-  },
-  "caregiver": {
-    "badge": "Professional Caregiver Portal",
-    "title": "Caregiver Console",
-    "subtitle": "Manage comprehensive senior care plans, clinical visit schedules, and health observations.",
-    "carePlans": "Care Plans",
-    "newPlan": "New Plan",
-    "noPlans": "No care plans configured yet.",
-    "dietary": "Dietary",
-    "clinicalSchedules": "Clinical Schedules"
   },
   "admin": {
     "badge": "System Administration",

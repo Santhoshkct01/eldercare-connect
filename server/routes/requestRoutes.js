@@ -8,11 +8,15 @@ const {
   assignVolunteerManually,
   reassignVolunteer,
   updateRequestStatus,
+  updateRequest,
+  cancelRequest,
 } = require('../controllers/requestController');
 const { protect, authorize } = require('../middleware/auth');
 
 router.post('/', protect, createRequest);
 router.get('/', protect, getRequests);
+router.put('/:id', protect, updateRequest);
+router.put('/:id/cancel', protect, cancelRequest);
 router.get('/pending-assignment', protect, authorize('admin'), getPendingAssignmentRequests);
 router.get('/available-volunteers/:requestId', protect, authorize('admin'), getAvailableVolunteersForRequest);
 router.post('/:requestId/assign-volunteer', protect, authorize('admin'), assignVolunteerManually);

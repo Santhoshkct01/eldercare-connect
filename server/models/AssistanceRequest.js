@@ -80,6 +80,9 @@ const assistanceRequestSchema = new mongoose.Schema(
     ],
     notes: { type: String, default: '' },
     completedAt: { type: Date },
+    cancelledAt: { type: Date },
+    cancelledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    cancellationReason: { type: String, default: '' },
   },
   { timestamps: true }
 );

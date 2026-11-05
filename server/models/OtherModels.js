@@ -71,16 +71,6 @@ const expenseSchema = new mongoose.Schema({
   receiptUrl: { type: String, default: '' }
 }, { timestamps: true });
 
-// Caregiver Care Plan
-const carePlanSchema = new mongoose.Schema({
-  elder: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  caregiver: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  goals: [{ type: String }],
-  dietaryRestrictions: { type: String, default: 'None' },
-  dailySchedule: [{ time: String, activity: String }],
-  notes: { type: String, default: '' }
-}, { timestamps: true });
-
 module.exports = {
   TrustedContact: mongoose.model('TrustedContact', trustedContactSchema),
   CheckIn: mongoose.model('CheckIn', checkInSchema),
@@ -90,6 +80,5 @@ module.exports = {
   CommunityEvent: mongoose.model('CommunityEvent', communityEventSchema),
   MedicalDocument: mongoose.model('MedicalDocument', medicalDocumentSchema),
   Expense: mongoose.model('Expense', expenseSchema),
-  CarePlan: mongoose.model('CarePlan', carePlanSchema),
 };
 

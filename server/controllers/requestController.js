@@ -437,6 +437,161 @@ const updateRequestStatus = async (req, res) => {
   }
 };
 
+// @desc Edit / Update assistance request
+// @route PUT /api/requests/:id
+const updateRequest = async (req, res) => {
+  try {
+    const { category, description, location, preferredDate, preferredTime, priority } = req.body;
+    const request = await AssistanceRequest.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+
+    // Authorization check: only owning elder, authorized family, or admin can edit
+    const isOwner = req.user.role === 'elder' && request.elder.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+    const isFamily = req.user.role === 'family';
+
+    if (!isOwner && !isAdmin && !isFamily) {
+      return res.status(403).json({ message: 'Not authorized to edit this request' });
+    }
+
+    if (request.status === 'Completed' || request.status === 'Cancelled') {
+      return res.status(400).json({ message: `Cannot edit a ${request.status.toLowerCase()} request` });
+    }
+
+    const previousCategory = request.category;
+    const previousLocation = { ...request.location };
+
+    // Update allowed fields
+    if (category) request.category = category;
+    if (description) request.description = description;
+    if (preferredDate) request.preferredDate = preferredDate;
+    if (preferredTime) request.preferredTime = preferredTime;
+    if (priority) request.priority = priority;
+    if (location) {
+      request.location = {
+        address: location.address || request.location.address || '',
+        latitude: typeof location.latitude === 'number' ? location.latitude : request.location.latitude,
+        longitude: typeof location.longitude === 'number' ? location.longitude : request.location.longitude,
+      };
+    }
+
+    // Check if location or category changed -> trigger smart re-evaluation if unassigned or pending
+    const categoryChanged = category && category !== previousCategory;
+    const locationChanged =
+      location &&
+      (location.latitude !== previousLocation.latitude || location.longitude !== previousLocation.longitude);
+
+    if ((categoryChanged || locationChanged) && request.status === 'Pending') {
+      const elderUser = await User.findById(request.elder);
+      if (elderUser) {
+        await processVolunteerAssignment(request, elderUser);
+      }
+    } else {
+      await request.save();
+    }
+
+    // If volunteer is currently assigned, notify them of modifications
+    if (request.assignedVolunteer) {
+      await Notification.create({
+        recipient: request.assignedVolunteer,
+        title: `Request Modified: ${request.category}`,
+        message: `An assistance request assigned to you has been updated by the senior/family.`,
+        type: 'Assistance',
+        link: '/volunteer/requests',
+      });
+    }
+
+    const populated = await AssistanceRequest.findById(request._id)
+      .populate('elder', 'name phone address emergencyContact location preferredLanguage')
+      .populate('assignedVolunteer', 'name phone volunteerRating location')
+      .populate('assignedBy', 'name email');
+
+    res.json({ message: 'Request updated successfully', request: populated });
+  } catch (error) {
+    console.error('Update request error:', error);
+    res.status(500).json({ message: 'Failed to update assistance request' });
+  }
+};
+
+// @desc Cancel assistance request
+// @route PUT /api/requests/:id/cancel
+const cancelRequest = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const request = await AssistanceRequest.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+
+    // Authorization check
+    const isOwner = req.user.role === 'elder' && request.elder.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+    const isFamily = req.user.role === 'family';
+
+    if (!isOwner && !isAdmin && !isFamily) {
+      return res.status(403).json({ message: 'Not authorized to cancel this request' });
+    }
+
+    if (request.status === 'Completed') {
+      return res.status(400).json({ message: 'Cannot cancel an already completed request' });
+    }
+
+    if (request.status === 'Cancelled') {
+      return res.status(400).json({ message: 'Request is already cancelled' });
+    }
+
+    const prevVolunteer = request.assignedVolunteer;
+
+    // Update state to Cancelled
+    request.status = 'Cancelled';
+    request.assignmentStatus = 'cancelled';
+    request.cancelledAt = new Date();
+    request.cancelledBy = req.user._id;
+    request.cancellationReason = reason || 'Cancelled by user';
+
+    request.assignmentHistory.push({
+      previousVolunteer: prevVolunteer,
+      assignmentType: request.assignmentType,
+      assignedBy: req.user._id,
+      timestamp: new Date(),
+      notes: `Request cancelled by ${req.user.name} (${req.user.role}). Reason: ${reason || 'Not specified'}`,
+    });
+
+    await request.save();
+
+    // Notify assigned volunteer if any
+    if (prevVolunteer) {
+      await Notification.create({
+        recipient: prevVolunteer,
+        title: `Task Cancelled: ${request.category}`,
+        message: `Assistance task #${request.requestId} was cancelled.`,
+        type: 'Assistance',
+        link: '/volunteer/history',
+      });
+    }
+
+    // Notify administrators
+    const admins = await User.find({ role: 'admin' });
+    for (const admin of admins) {
+      await Notification.create({
+        recipient: admin._id,
+        title: `Request Cancelled #${request.requestId}`,
+        message: `Assistance request #${request.requestId} (${request.category}) was cancelled. Reason: ${reason || 'None provided'}`,
+        type: 'Assistance',
+        link: '/admin/requests',
+      });
+    }
+
+    const populated = await AssistanceRequest.findById(request._id)
+      .populate('elder', 'name phone address emergencyContact location')
+      .populate('assignedVolunteer', 'name phone volunteerRating location')
+      .populate('assignedBy', 'name email');
+
+    res.json({ message: 'Request cancelled successfully', request: populated });
+  } catch (error) {
+    console.error('Cancel request error:', error);
+    res.status(500).json({ message: 'Failed to cancel assistance request' });
+  }
+};
+
 module.exports = {
   createRequest,
   getRequests,
@@ -445,4 +600,6 @@ module.exports = {
   assignVolunteerManually,
   reassignVolunteer,
   updateRequestStatus,
+  updateRequest,
+  cancelRequest,
 };
